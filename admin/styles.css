@@ -1,0 +1,126 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", sans-serif;
+  color: #141414;
+  background: #f2f2ee;
+}
+
+.admin-shell {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-head h1 {
+  margin: 0;
+}
+
+.admin-head p {
+  margin: 0.45rem 0 0;
+  color: #50545a;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #d2d5da;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.panel h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1.1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+input,
+textarea,
+button {
+  width: 100%;
+  margin-top: 0.3rem;
+  border: 1px solid #bcc1c7;
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: #0f4c5c;
+  border-color: #0f4c5c;
+  color: #fff;
+  font-weight: 600;
+}
+
+button:hover,
+button:focus-visible {
+  background: #0d3f4b;
+  border-color: #0d3f4b;
+}
+
+.list {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.list-item {
+  border: 1px solid #d2d5da;
+  border-radius: 10px;
+  padding: 0.7rem;
+  background: #fbfbfa;
+}
+
+.list-item p {
+  margin: 0.2rem 0;
+  color: #4b5056;
+}
+
+.list-actions {
+  margin-top: 0.5rem;
+}
+
+.list-actions button {
+  width: auto;
+  padding: 0.4rem 0.65rem;
+  background: #5a1e1e;
+  border-color: #5a1e1e;
+}
+
+.panel-note p {
+  margin: 0;
+}
+
+code {
+  background: #eceeea;
+  border-radius: 6px;
+  padding: 0.1rem 0.35rem;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 760px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

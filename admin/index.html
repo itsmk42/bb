@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Content Manager | Builder Ballery</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/admin/styles.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-head">
+      <h1>Content Manager</h1>
+      <p>Use this page to maintain videos and documents. Export JSON and replace files in <code>/content</code>.</p>
+      <p><a href="/">Back to website</a></p>
+    </header>
+
+    <section class="panel">
+      <h2>Add Video</h2>
+      <form id="video-form" class="form-grid">
+        <label>
+          Title
+          <input name="title" type="text" required>
+        </label>
+        <label>
+          Category
+          <input name="category" type="text" required placeholder="Example: Structural">
+        </label>
+        <label class="full">
+          Instagram Reel URL
+          <input name="reelUrl" type="url" required placeholder="https://www.instagram.com/reel/.../">
+        </label>
+        <label class="full">
+          Summary (2-3 lines)
+          <textarea name="summary" rows="4" required></textarea>
+        </label>
+        <label class="full">
+          Related Document IDs (comma separated)
+          <input name="relatedDocumentIds" type="text" placeholder="doc-001, doc-002">
+        </label>
+        <button type="submit">Add Video</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Videos List</h2>
+      <div id="videos-list" class="list"></div>
+      <button id="download-videos" type="button">Download videos.json</button>
+    </section>
+
+    <section class="panel">
+      <h2>Add Document</h2>
+      <form id="doc-form" class="form-grid">
+        <label>
+          ID
+          <input name="id" type="text" required placeholder="doc-bbmp-approval-checklist">
+        </label>
+        <label>
+          Date
+          <input name="date" type="date" required>
+        </label>
+        <label class="full">
+          Title
+          <input name="title" type="text" required>
+        </label>
+        <label class="full">
+          Short Explanation
+          <textarea name="description" rows="3" required></textarea>
+        </label>
+        <label class="full">
+          Download URL
+          <input name="downloadUrl" type="text" required placeholder="/documents/your-file.pdf">
+        </label>
+        <button type="submit">Add Document</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Documents List</h2>
+      <div id="docs-list" class="list"></div>
+      <button id="download-docs" type="button">Download documents.json</button>
+    </section>
+
+    <section class="panel panel-note">
+      <h2>PDF Upload Path</h2>
+      <p>Upload files to <code>/documents</code> and set the matching path in each document entry (example: <code>/documents/approval-checklist.pdf</code>).</p>
+    </section>
+  </main>
+
+  <script src="/admin/app.js" defer></script>
+</body>
+</html>

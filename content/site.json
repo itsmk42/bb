@@ -1,0 +1,16 @@
+{
+  "personName": "Builder Ballery",
+  "headline": "Residential Construction Clarity, Backed by 12+ Years on Site.",
+  "bioParagraph": "I come from a small village near Kukke Subrahmanya in the foothills of the Western Ghats. I first learned construction by working as a helper whenever families in our village were building homes, then added formal technical depth through a B.Tech in Civil Engineering.",
+  "introParagraph": "For the last 12 years, I have worked only in residential construction. From Sahakar Nagar, Bangalore, I work directly with families and monitor every project closely so execution stays practical, transparent, and technically sound.",
+  "defaultVideoCategories": [
+    "Structural",
+    "Materials",
+    "Buying Mistakes",
+    "Documentation",
+    "Site Execution",
+    "Approvals and Rules"
+  ],
+  "inquiryEndpoint": "https://formsubmit.co/YOUR_EMAIL@example.com",
+  "inquirySuccessRedirect": "https://builderballery.com/#consultation"
+}
