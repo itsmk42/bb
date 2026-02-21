@@ -30,6 +30,7 @@ body {
   margin: 0;
   font-family: "Manrope", "Segoe UI", sans-serif;
   color: var(--ink-900);
+  min-height: 100vh;
   background:
     radial-gradient(circle at 10% -5%, rgba(20, 42, 58, 0.24), transparent 35%),
     radial-gradient(circle at 92% 4%, rgba(243, 161, 13, 0.12), transparent 30%),
@@ -41,6 +42,7 @@ body {
   position: fixed;
   inset: 0;
   pointer-events: none;
+  z-index: 0;
   background-image:
     linear-gradient(rgba(14, 26, 36, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(14, 26, 36, 0.035) 1px, transparent 1px);
@@ -48,9 +50,33 @@ body {
   mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.75), transparent 88%);
 }
 
+.bg-overlay::before,
+.bg-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.bg-overlay::before {
+  background:
+    repeating-linear-gradient(125deg, rgba(21, 37, 50, 0.05) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(35deg, rgba(243, 161, 13, 0.06) 0 1px, transparent 1px 62px);
+  opacity: 0.56;
+}
+
+.bg-overlay::after {
+  background:
+    radial-gradient(circle at 85% 82%, rgba(14, 35, 49, 0.18) 0%, rgba(14, 35, 49, 0) 30%),
+    radial-gradient(circle at 8% 90%, rgba(49, 78, 99, 0.2) 0%, rgba(49, 78, 99, 0) 28%),
+    radial-gradient(circle at 92% 12%, rgba(243, 161, 13, 0.22) 0%, rgba(243, 161, 13, 0) 22%);
+  opacity: 0.65;
+}
+
 .container {
   width: min(1120px, 100% - 2rem);
   margin-inline: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .site-header {
@@ -71,6 +97,9 @@ body {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.62rem;
   text-decoration: none;
   color: var(--ink-950);
   font-family: "Rajdhani", sans-serif;
@@ -78,6 +107,23 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  border: 2px solid rgba(43, 63, 77, 0.55);
+  box-shadow: 0 6px 18px rgba(15, 30, 41, 0.22);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.brand-text {
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .site-nav {
@@ -108,6 +154,18 @@ body {
 
 .section {
   padding: 3.2rem 0;
+  position: relative;
+}
+
+.section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(29, 50, 67, 0.03) 0 1px, transparent 1px 96px),
+    repeating-linear-gradient(0deg, rgba(29, 50, 67, 0.03) 0 1px, transparent 1px 96px);
+  opacity: 0.35;
 }
 
 .hero {
@@ -128,6 +186,17 @@ body {
   box-shadow: var(--shadow-xl);
   position: relative;
   overflow: hidden;
+}
+
+.hero-main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(228, 237, 245, 0.055) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(228, 237, 245, 0.045) 0 1px, transparent 1px 22px),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
 }
 
 .hero-main::after {
@@ -598,6 +667,11 @@ textarea:focus-visible {
 @media (min-width: 760px) {
   .container {
     width: min(1120px, 100% - 2.4rem);
+  }
+
+  .brand-logo {
+    width: 46px;
+    height: 46px;
   }
 
   .hero-main,
