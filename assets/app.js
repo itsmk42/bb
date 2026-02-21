@@ -251,7 +251,52 @@ function configureForm(site) {
   }
 }
 
+function configureMobileMenu() {
+  const header = document.querySelector(".site-header");
+  const toggle = byId("mobile-menu-toggle");
+  const nav = byId("primary-nav");
+  if (!header || !toggle || !nav) return;
+
+  const closeMenu = () => {
+    header.classList.remove("menu-open");
+    toggle.setAttribute("aria-expanded", "false");
+  };
+
+  toggle.addEventListener("click", () => {
+    const shouldOpen = !header.classList.contains("menu-open");
+    header.classList.toggle("menu-open", shouldOpen);
+    toggle.setAttribute("aria-expanded", String(shouldOpen));
+  });
+
+  nav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!header.classList.contains("menu-open")) return;
+    if (target instanceof Node && header.contains(target)) return;
+    closeMenu();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+
+  const desktopMq = window.matchMedia("(min-width: 760px)");
+  const handleDesktop = (event) => {
+    if (event.matches) closeMenu();
+  };
+  if (typeof desktopMq.addEventListener === "function") {
+    desktopMq.addEventListener("change", handleDesktop);
+  } else if (typeof desktopMq.addListener === "function") {
+    desktopMq.addListener(handleDesktop);
+  }
+}
+
 async function init() {
+  configureMobileMenu();
+
   const [site, videos, documents] = await Promise.all([
     fetchJson(SITE_PATH, {}),
     fetchJson(VIDEOS_PATH, []),
