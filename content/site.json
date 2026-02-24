@@ -8,8 +8,7 @@
     "Materials",
     "Buying Mistakes",
     "Documentation",
-    "Site Execution",
-    "Approvals and Rules"
+    "Site Execution"
   ],
   "inquiryEndpoint": "https://formsubmit.co/YOUR_EMAIL@example.com",
   "inquirySuccessRedirect": "https://builderballery.com/#consultation",

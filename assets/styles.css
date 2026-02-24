@@ -1227,3 +1227,88 @@ textarea:focus-visible {
     box-shadow: none;
   }
 }
+
+/* Brand + background refinement */
+body {
+  background-color: #091018;
+  background-image:
+    radial-gradient(circle at 12% 14%, rgba(37, 99, 235, 0.24), transparent 34%),
+    radial-gradient(circle at 86% 82%, rgba(245, 158, 11, 0.16), transparent 30%),
+    linear-gradient(rgba(133, 161, 184, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(133, 161, 184, 0.14) 1px, transparent 1px),
+    linear-gradient(180deg, #081018 0%, #0d1822 48%, #081018 100%);
+  background-size: auto, auto, 46px 46px, 46px 46px, auto;
+}
+
+.bg-overlay::before {
+  background-image:
+    linear-gradient(90deg, rgba(122, 149, 171, 0.12) 1px, transparent 1px),
+    linear-gradient(rgba(122, 149, 171, 0.12) 1px, transparent 1px);
+  background-size: 128px 128px;
+  opacity: 0.45;
+}
+
+.bg-overlay::after {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(37, 99, 235, 0.18) 0%, transparent 44%),
+    radial-gradient(circle at 78% 78%, rgba(245, 158, 11, 0.12) 0%, transparent 36%);
+}
+
+.site-header {
+  background: rgba(7, 14, 20, 0.78);
+  border-bottom: 1px solid rgba(193, 205, 216, 0.22);
+}
+
+.brand {
+  gap: 0.6rem;
+}
+
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(8, 14, 20, 0.72), 0 8px 18px rgba(3, 8, 12, 0.32);
+}
+
+.brand-text {
+  display: inline-grid;
+  gap: 0.08rem;
+  padding: 0.32rem 0.62rem 0.34rem;
+  border: 1px solid rgba(193, 205, 216, 0.32);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)),
+    rgba(6, 11, 16, 0.74);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 18px rgba(3, 8, 12, 0.24);
+  line-height: 1;
+}
+
+.brand-word {
+  display: block;
+  color: #dce8f2;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.brand-word-accent {
+  color: #ffd078;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+@media (max-width: 540px) {
+  .brand-text {
+    padding: 0.26rem 0.5rem 0.28rem;
+  }
+
+  .brand-word {
+    font-size: 0.5rem;
+  }
+
+  .brand-word-accent {
+    font-size: 0.68rem;
+  }
+}
