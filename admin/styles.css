@@ -4,122 +4,270 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-0: #0c141c;
+  --bg-1: #101a24;
+  --panel: #141f2b;
+  --panel-soft: #1a2735;
+  --line: #2a394a;
+  --text: #e7edf3;
+  --muted: #9db1c2;
+  --accent: #ffb72d;
+  --accent-dark: #d79214;
+  --danger: #c64040;
+  --ok: #2ea667;
+  --font: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 body {
   margin: 0;
-  font-family: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", sans-serif;
-  color: #141414;
-  background: #f2f2ee;
+  min-height: 100vh;
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(37, 99, 235, 0.16), transparent 32%),
+    radial-gradient(circle at 86% 85%, rgba(245, 158, 11, 0.11), transparent 28%),
+    linear-gradient(rgba(120, 142, 160, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 142, 160, 0.12) 1px, transparent 1px),
+    linear-gradient(180deg, #0a131b 0%, #111c27 52%, #0a131b 100%);
+  background-size: auto, auto, 42px 42px, 42px 42px, auto;
+}
+
+a {
+  color: #8ac2ff;
 }
 
 .admin-shell {
-  width: min(100%, 980px);
+  width: min(1120px, 100% - 2rem);
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1.25rem 0 2.5rem;
   display: grid;
   gap: 1rem;
 }
 
+.panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)), var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 14px 28px rgba(3, 8, 13, 0.3);
+}
+
 .admin-head h1 {
   margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
 }
 
 .admin-head p {
-  margin: 0.45rem 0 0;
-  color: #50545a;
+  margin: 0.55rem 0 0;
+  color: var(--muted);
 }
 
-.panel {
-  background: #fff;
-  border: 1px solid #d2d5da;
-  border-radius: 12px;
-  padding: 1rem;
-}
-
-.panel h2 {
-  margin: 0 0 0.85rem;
-  font-size: 1.1rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-input,
-textarea,
-button {
-  width: 100%;
-  margin-top: 0.3rem;
-  border: 1px solid #bcc1c7;
-  border-radius: 8px;
-  padding: 0.6rem 0.7rem;
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-  background: #0f4c5c;
-  border-color: #0f4c5c;
-  color: #fff;
-  font-weight: 600;
-}
-
-button:hover,
-button:focus-visible {
-  background: #0d3f4b;
-  border-color: #0d3f4b;
-}
-
-.list {
-  display: grid;
-  gap: 0.6rem;
-  margin-bottom: 0.75rem;
-}
-
-.list-item {
-  border: 1px solid #d2d5da;
-  border-radius: 10px;
-  padding: 0.7rem;
-  background: #fbfbfa;
-}
-
-.list-item p {
-  margin: 0.2rem 0;
-  color: #4b5056;
-}
-
-.list-actions {
-  margin-top: 0.5rem;
-}
-
-.list-actions button {
-  width: auto;
-  padding: 0.4rem 0.65rem;
-  background: #5a1e1e;
-  border-color: #5a1e1e;
-}
-
-.panel-note p {
+h2,
+h3 {
   margin: 0;
 }
 
-code {
-  background: #eceeea;
-  border-radius: 6px;
-  padding: 0.1rem 0.35rem;
+h2 {
+  font-size: 1.2rem;
+}
+
+h3 {
+  font-size: 1rem;
+  color: #d7e2ec;
+}
+
+.auth-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+
+.auth-actions {
+  margin-top: 0.9rem;
+}
+
+.manager-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.manager-head p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+}
+
+.manager-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.subpanel {
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.subpanel-note p {
+  margin: 0.65rem 0 0;
+  color: var(--muted);
+}
+
+.form-grid {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: #cdd9e4;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #34485b;
+  border-radius: 10px;
+  padding: 0.62rem 0.72rem;
+  background: #0f1821;
+  color: #eaf0f6;
+  font: inherit;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: #6ca8ff;
+  box-shadow: 0 0 0 3px rgba(77, 147, 255, 0.22);
 }
 
 .full {
   grid-column: 1 / -1;
 }
 
+.btn {
+  appearance: none;
+  width: auto;
+  border: 1px solid var(--accent-dark);
+  border-radius: 10px;
+  padding: 0.58rem 0.9rem;
+  background: linear-gradient(180deg, #ffc250, #ffb72d);
+  color: #2b1d00;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  filter: brightness(1.03);
+}
+
+.btn-secondary {
+  border-color: #466182;
+  background: #21344a;
+  color: #e6eef7;
+}
+
+.btn-google {
+  border-color: #445a73;
+  background: #182736;
+  color: #deebf8;
+}
+
+.btn-danger {
+  border-color: #9f2f2f;
+  background: #7f2525;
+  color: #fff;
+}
+
+.list {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.list-item {
+  border: 1px solid #36495c;
+  border-radius: 10px;
+  padding: 0.72rem;
+  background: #101a25;
+}
+
+.list-item strong {
+  display: block;
+}
+
+.list-item p {
+  margin: 0.36rem 0 0;
+  color: #b6c6d5;
+}
+
+.list-item p span {
+  color: #dde7ef;
+}
+
+.list-actions {
+  margin-top: 0.65rem;
+}
+
+.status {
+  margin: 0.85rem 0 0;
+  font-size: 0.92rem;
+  min-height: 1.2rem;
+}
+
+.status-info {
+  color: #9fc0de;
+}
+
+.status-success {
+  color: #73d9a2;
+}
+
+.status-error {
+  color: #ff9191;
+}
+
+.hidden {
+  display: none !important;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: #0f1922;
+  border: 1px solid #304355;
+  color: #d7e4f0;
+  border-radius: 8px;
+  padding: 0.12rem 0.35rem;
+}
+
 @media (min-width: 760px) {
+  .auth-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .manager-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .manager-grid > .subpanel:last-of-type,
+  .subpanel-note {
+    grid-column: 1 / -1;
+  }
+
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

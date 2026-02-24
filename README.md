@@ -11,7 +11,28 @@ Practical authority website for residential construction guidance.
 - `/content/videos.json`: Video entries
 - `/content/documents.json`: Document entries
 - `/documents`: PDF storage
-- `/admin/index.html`: Simple content manager for JSON updates
+- `/admin/index.html`: Authenticated content manager (Sign In, Sign Up, Google OAuth)
+- `/admin/app.js`: Supabase auth, CRUD, and storage upload logic
+- `/supabase/setup.sql`: SQL setup for tables, storage bucket, and policies
+
+## Backend setup (Supabase)
+
+1. Open Supabase SQL Editor and run `/supabase/setup.sql`.
+2. In Supabase Auth -> URL Configuration, add site URL and redirect URL:
+   - `https://builderballery.com`
+   - `https://builderballery.com/admin/index.html`
+   - `http://localhost:3000/admin/index.html` (for local testing)
+3. In Supabase Auth -> Providers, enable Google and configure Google OAuth credentials.
+4. Open `/admin/index.html`, create your account with Sign Up, then sign in.
+
+## How content loading works
+
+- Public website reads from Supabase tables `videos` and `documents` when rows exist.
+- If Supabase tables are empty or unavailable, website falls back to local JSON:
+  - `/content/videos.json`
+  - `/content/documents.json`
+- Admin uploads documents to Supabase storage bucket `documents` and writes metadata to table `documents`.
+- Admin adds reels directly to table `videos`.
 
 ## Form to email setup
 
@@ -29,42 +50,10 @@ Example using FormSubmit:
 "inquiryEndpoint": "https://formsubmit.co/yourname@example.com"
 ```
 
-## Add videos
+## Content operations
 
-Edit `/content/videos.json` or use `/admin/index.html` and export.
-
-Schema:
-
-```json
-[
-  {
-    "title": "Column Layout Mistakes",
-    "category": "Structural",
-    "reelUrl": "https://www.instagram.com/reel/XXXXXXXXXXX/",
-    "summary": "Explains how wrong column placement affects planning and load path. Shows a practical site check before slab casting.",
-    "relatedDocumentIds": ["doc-001"]
-  }
-]
-```
-
-## Add documents
-
-1. Upload PDF to `/documents`.
-2. Add metadata in `/content/documents.json`.
-
-Schema:
-
-```json
-[
-  {
-    "id": "doc-001",
-    "title": "BBMP Plan Approval Checklist",
-    "description": "Checklist of plan approval items for residential submission and review.",
-    "date": "2026-02-20",
-    "downloadUrl": "/documents/bbmp-plan-approval-checklist.pdf"
-  }
-]
-```
+- Preferred method: use `/admin/index.html`.
+- Fallback method: edit `/content/videos.json` and `/content/documents.json` directly.
 
 ## SEO
 
