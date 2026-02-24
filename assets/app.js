@@ -3,11 +3,17 @@ const VIDEOS_PATH = "/content/videos.json";
 const DOCUMENTS_PATH = "/content/documents.json";
 
 // Initialize Supabase Client
-const supabaseUrl = 'https://onahtndmilugzhjwjtam.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U';
+const config = window.BUILDERBALLERY_CONFIG || {};
+const supabaseUrl = String(config.SUPABASE_URL || "https://onahtndmilugzhjwjtam.supabase.co").trim();
+const supabaseKey = String(
+  config.SUPABASE_ANON_KEY ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
+).trim();
 // The object exposed by the CDN is window.supabase
 const supabaseClient = window.supabase?.createClient
-  ? window.supabase.createClient(supabaseUrl, supabaseKey)
+  ? supabaseUrl && supabaseKey
+    ? window.supabase.createClient(supabaseUrl, supabaseKey)
+    : null
   : null;
 function byId(id) {
   return document.getElementById(id);
