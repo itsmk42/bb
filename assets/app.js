@@ -62,10 +62,26 @@ function makeSlug(text) {
 function normalizeInstagramEmbedUrl(input) {
   if (!input) return "";
   const raw = String(input).trim();
-  if (raw.includes("/embed")) return raw;
-  const cleaned = raw.endsWith("/") ? raw : `${raw}/`;
-  if (!cleaned.includes("instagram.com")) return "";
-  return `${cleaned}embed/`;
+
+  try {
+    const parsed = raw.startsWith("http")
+      ? new URL(raw)
+      : new URL(`https://www.instagram.com/${raw.replace(/^\/+/, "")}`);
+
+    const hostname = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (hostname !== "instagram.com") return "";
+
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 2) return "";
+
+    const type = segments[0];
+    const id = segments[1];
+    if (!["reel", "p", "tv"].includes(type) || !id) return "";
+
+    return `https://www.instagram.com/${type}/${id}/embed/captioned/`;
+  } catch {
+    return "";
+  }
 }
 
 function formatDate(dateValue) {
@@ -176,6 +192,12 @@ function renderVideos(videos, documents, preferredCategories) {
       iframe.className = "video-frame";
       iframe.loading = "lazy";
       iframe.allowFullscreen = true;
+      iframe.setAttribute(
+        "allow",
+        "autoplay; encrypted-media; picture-in-picture; clipboard-write; web-share"
+      );
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      iframe.scrolling = "no";
       iframe.title = video.title || `${category} reel`;
       const embedUrl = normalizeInstagramEmbedUrl(video.reelUrl);
       if (embedUrl) {
@@ -191,12 +213,12 @@ function renderVideos(videos, documents, preferredCategories) {
       summary.textContent = video.summary || "Summary not added yet.";
       card.appendChild(summary);
 
-      if (!embedUrl && video.reelUrl) {
+      if (video.reelUrl) {
         const fallbackLink = document.createElement("a");
         fallbackLink.href = video.reelUrl;
         fallbackLink.target = "_blank";
         fallbackLink.rel = "noopener";
-        fallbackLink.textContent = "Open reel";
+        fallbackLink.textContent = embedUrl ? "Watch on Instagram" : "Open reel";
         fallbackLink.className = "chip";
         card.appendChild(fallbackLink);
       }
@@ -356,7 +378,7 @@ function configureWhatsApp(site) {
 
   const link = String(
     site?.whatsappLink ||
-      "https://wa.me/919000000000?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
+      "https://wa.me/919008697029?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
   ).trim();
 
   button.href = link;
