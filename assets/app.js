@@ -294,13 +294,22 @@ function renderDocuments(documents) {
     const actions = document.createElement("div");
     actions.className = "doc-actions";
 
-    const button = document.createElement("a");
-    button.className = "btn";
-    button.href = doc.downloadUrl || "#";
-    button.target = "_blank";
-    button.rel = "noopener";
-    button.textContent = "Download";
-    actions.appendChild(button);
+    const viewButton = document.createElement("a");
+    viewButton.className = "btn btn-secondary";
+    viewButton.href = doc.downloadUrl || "#";
+    viewButton.target = "_blank";
+    viewButton.rel = "noopener";
+    viewButton.textContent = "View";
+    actions.appendChild(viewButton);
+
+    const downloadButton = document.createElement("a");
+    downloadButton.className = "btn";
+    downloadButton.href = doc.downloadUrl || "#";
+    downloadButton.target = "_blank";
+    downloadButton.rel = "noopener";
+    downloadButton.setAttribute("download", "");
+    downloadButton.textContent = "Download";
+    actions.appendChild(downloadButton);
 
     card.appendChild(actions);
     root.appendChild(card);

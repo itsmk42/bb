@@ -376,6 +376,10 @@ h1 {
   background: var(--signal);
 }
 
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.74);
+}
+
 .hero-main .btn {
   border-color: rgba(255, 255, 255, 0.4);
   color: var(--white);
@@ -779,6 +783,14 @@ textarea:focus-visible {
 
 .doc-actions {
   margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.doc-actions .btn {
+  min-width: 110px;
+  padding-inline: 1rem;
 }
 
 .empty-state {
