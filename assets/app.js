@@ -13,6 +13,44 @@ function byId(id) {
   return document.getElementById(id);
 }
 
+function isReloadNavigation() {
+  const entries = typeof performance !== "undefined" && typeof performance.getEntriesByType === "function"
+    ? performance.getEntriesByType("navigation")
+    : [];
+
+  if (Array.isArray(entries) && entries.length > 0) {
+    return entries[0]?.type === "reload";
+  }
+
+  // Legacy fallback for older engines.
+  return Boolean(
+    typeof performance !== "undefined" &&
+      performance.navigation &&
+      performance.navigation.type === 1
+  );
+}
+
+function resetToHeroOnReload() {
+  if (!isReloadNavigation()) return;
+
+  if ("scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
+
+  const cleanUrl = `${window.location.pathname}${window.location.search}`;
+  if (window.location.hash) {
+    window.history.replaceState(null, document.title, cleanUrl);
+  }
+
+  const scrollTopNow = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+
+  scrollTopNow();
+  requestAnimationFrame(scrollTopNow);
+  window.addEventListener("load", scrollTopNow, { once: true });
+}
+
 function makeSlug(text) {
   return String(text || "")
     .toLowerCase()
@@ -325,6 +363,7 @@ function configureWhatsApp(site) {
 }
 
 async function init() {
+  resetToHeroOnReload();
   configureMobileMenu();
 
   const [siteResponse, fallbackVideos, fallbackDocuments, dbVideos, dbDocuments] = await Promise.all([
