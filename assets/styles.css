@@ -1312,3 +1312,22 @@ body {
     font-size: 0.68rem;
   }
 }
+
+.site-nav a.nav-login {
+  border-color: rgba(108, 168, 255, 0.58);
+  background: rgba(108, 168, 255, 0.14);
+  color: #d6e9ff;
+}
+
+.site-nav a.nav-login:hover,
+.site-nav a.nav-login:focus-visible {
+  border-color: rgba(151, 196, 255, 0.75);
+  background: rgba(108, 168, 255, 0.2);
+}
+
+@media (min-width: 760px) {
+  .site-nav a.nav-login {
+    border-color: rgba(108, 168, 255, 0.45);
+    background: rgba(108, 168, 255, 0.1);
+  }
+}
