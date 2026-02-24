@@ -14,15 +14,16 @@
   --signal-dark: #d97706;
   --accent: #2563eb; /* Blueprint accent */
   --white: #ffffff;
+  --font-sans: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   
   /* Structural Geometry */
-  --radius: 0px; /* Sharp corners */
-  --radius-sm: 0px;
+  --radius: 20px;
+  --radius-sm: 14px;
   
   /* Precision Shadows */
-  --shadow-xl: 0 20px 40px -10px rgba(18, 24, 31, 0.15);
-  --shadow-md: 0 10px 20px -5px rgba(18, 24, 31, 0.1);
-  --shadow-hard: 4px 4px 0px rgba(18, 24, 31, 0.9);
+  --shadow-xl: 0 20px 44px rgba(6, 14, 22, 0.3);
+  --shadow-md: 0 10px 24px rgba(6, 14, 22, 0.2);
+  --shadow-hard: 0 12px 28px rgba(6, 14, 22, 0.34);
   
   --hazard-stripe: repeating-linear-gradient(45deg, var(--signal), var(--signal) 10px, #12181f 10px, #12181f 20px);
 }
@@ -39,7 +40,7 @@ html {
 
 body {
   margin: 0;
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   color: var(--steel-100);
   min-height: 100vh;
   /* Dark blueprint/graph paper background */
@@ -126,7 +127,7 @@ body {
   gap: 0.75rem;
   text-decoration: none;
   color: var(--steel-100);
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.1em; /* Architectural tracking */
@@ -215,7 +216,7 @@ body {
 .site-nav a {
   text-decoration: none;
   color: var(--steel-100);
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 0.75rem 1rem;
@@ -284,7 +285,7 @@ body {
 
 .eyebrow {
   margin: 0;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.75rem;
@@ -306,7 +307,7 @@ body {
 
 h1,h2,h3,h4 {
   margin: 0;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.1;
   text-transform: uppercase;
 }
@@ -345,7 +346,7 @@ h1 {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   border: 2px solid var(--ink-900);
   border-radius: 0;
   color: var(--ink-950);
@@ -430,7 +431,7 @@ h1 {
 
 .panel-kicker {
   margin: 0;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--ink-700);
@@ -471,7 +472,7 @@ h1 {
 
 .stats-list strong {
   display: block;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   margin-top: 0.2rem;
   color: var(--ink-950);
   font-size: 1.2rem;
@@ -487,7 +488,7 @@ h1 {
 
 .section-id {
   margin: 0;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
@@ -519,7 +520,7 @@ h1 {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   border: 2px solid var(--ink-900);
   color: var(--ink-900);
   background: var(--concrete-50);
@@ -634,7 +635,7 @@ h1 {
 
 .related-docs a {
   text-decoration: none;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   color: var(--accent);
   font-size: 0.9rem;
   font-weight: 700;
@@ -679,7 +680,7 @@ h1 {
 
 label {
   display: block;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -695,7 +696,7 @@ textarea {
   border: 2px solid var(--steel-300);
   border-radius: 0;
   padding: 0.75rem 1rem;
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   color: var(--ink-950);
   background: var(--concrete-50);
@@ -713,7 +714,7 @@ textarea:focus-visible {
 
 .form-help {
   margin: 1rem 0 0;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -768,7 +769,7 @@ textarea:focus-visible {
 }
 
 .doc-meta {
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -785,7 +786,7 @@ textarea:focus-visible {
   padding: 2rem;
   background: rgba(255,255,255,0.5);
   color: var(--ink-700);
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -810,7 +811,7 @@ textarea:focus-visible {
 
 .footer-inner p {
   margin: 0;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -818,7 +819,7 @@ textarea:focus-visible {
 
 .footer-inner a {
   color: var(--signal);
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -845,7 +846,7 @@ textarea:focus-visible {
   border: 2px solid #0b4728;
   background: #25d366;
   color: #07351d;
-  font-family: "Rajdhani", sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1026,5 +1027,191 @@ textarea:focus-visible {
   
   .video-grid {
     gap: 2rem;
+  }
+}
+
+/* Apple UI refinement layer */
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+.brand,
+.site-nav a,
+.btn,
+.chip,
+.section-id,
+.eyebrow,
+label,
+.form-help,
+.doc-meta,
+.footer-inner p,
+.footer-inner a,
+.whatsapp-float {
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.site-header::before,
+.video-category::before,
+.hero-panel::before,
+.hero-main::after,
+.doc-card::before,
+.eyebrow::before {
+  display: none;
+}
+
+.header-inner {
+  margin-top: 0;
+}
+
+.site-header {
+  border-bottom: 1px solid rgba(193, 205, 216, 0.25);
+  background: rgba(9, 16, 24, 0.72);
+  backdrop-filter: blur(14px) saturate(160%);
+}
+
+.mobile-menu-toggle,
+.site-nav,
+.hero-main,
+.hero-panel,
+.video-category,
+.video-card,
+.inquiry-form,
+.doc-card,
+.btn,
+.chip,
+input,
+select,
+textarea,
+.whatsapp-float {
+  border-radius: var(--radius-sm);
+}
+
+.mobile-menu-toggle {
+  border: 1px solid rgba(193, 205, 216, 0.45);
+  box-shadow: var(--shadow-md);
+}
+
+.mobile-menu-toggle:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-md);
+}
+
+.site-nav {
+  border: 1px solid rgba(193, 205, 216, 0.3);
+  box-shadow: var(--shadow-xl);
+}
+
+.site-nav a {
+  font-weight: 600;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  transform: none;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.hero-main,
+.hero-panel,
+.video-category,
+.inquiry-form,
+.doc-card {
+  border: 1px solid rgba(193, 205, 216, 0.3);
+  box-shadow: var(--shadow-xl);
+}
+
+.hero-main {
+  border-left: 1px solid rgba(37, 99, 235, 0.55);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+}
+
+.btn {
+  border: 1px solid rgba(18, 24, 31, 0.5);
+  box-shadow: 0 10px 24px rgba(6, 14, 22, 0.24);
+  font-weight: 600;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(6, 14, 22, 0.28);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 16px rgba(6, 14, 22, 0.2);
+}
+
+.hero-main .btn {
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 24px rgba(3, 8, 12, 0.35);
+}
+
+.hero-main .btn-primary {
+  background: linear-gradient(180deg, #ffbd4a 0%, #f59e0b 100%);
+  border-color: #f5b340;
+}
+
+.chip {
+  border: 1px solid rgba(18, 24, 31, 0.5);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.video-frame {
+  border: 1px solid rgba(18, 24, 31, 0.45);
+}
+
+input,
+select,
+textarea {
+  border: 1px solid rgba(140, 155, 173, 0.7);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: rgba(37, 99, 235, 0.95);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.24);
+}
+
+.site-footer {
+  border-top: 1px solid rgba(193, 205, 216, 0.26);
+}
+
+.whatsapp-float {
+  letter-spacing: 0.01em;
+  box-shadow: 0 16px 30px rgba(6, 14, 22, 0.35);
+}
+
+.whatsapp-float:hover,
+.whatsapp-float:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 34px rgba(6, 14, 22, 0.4);
+}
+
+.whatsapp-float:active {
+  transform: translateY(0);
+}
+
+@media (min-width: 760px) {
+  .site-nav a {
+    border: 1px solid transparent;
+  }
+
+  .site-nav a:hover,
+  .site-nav a:focus-visible,
+  .site-nav a:active {
+    transform: none;
+    box-shadow: none;
   }
 }
