@@ -5,8 +5,6 @@ const supabaseKey = String(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
 ).trim();
 const storageBucket = String(config.SUPABASE_STORAGE_BUCKET || "documents").trim() || "documents";
-const defaultAdminEmail = "builderjo@admin.com";
-const defaultAdminPassword = "Ss@1234q";
 
 const supabaseClient = window.supabase?.createClient
   ? supabaseUrl && supabaseKey
@@ -242,7 +240,7 @@ async function handleSignIn(event) {
     const message = String(error.message || "Sign in failed.");
     if (error.code === "email_not_confirmed" || /email not confirmed|email not verified/i.test(message)) {
       setAuthStatus(
-        "Email not verified. In Supabase: Authentication -> Providers -> Email, disable 'Confirm email' for admin login or verify this inbox first.",
+        "Email still not verified for this account. In Supabase go to Authentication -> Users -> builderjo@admin.com and confirm the user (or run SQL to set email_confirmed_at).",
         "error"
       );
     } else {
@@ -444,7 +442,6 @@ function wireManagerHandlers() {
 
 function wireAuthHandlers() {
   const signInForm = byId("signin-form");
-  const useDefaultLoginButton = byId("use-default-login");
 
   signInForm?.addEventListener("submit", async (event) => {
     try {
@@ -454,19 +451,6 @@ function wireAuthHandlers() {
     }
   });
 
-  useDefaultLoginButton?.addEventListener("click", () => {
-    if (!(signInForm instanceof HTMLFormElement)) return;
-    const emailInput = signInForm.elements.namedItem("email");
-    const passwordInput = signInForm.elements.namedItem("password");
-
-    if (emailInput instanceof HTMLInputElement) {
-      emailInput.value = defaultAdminEmail;
-    }
-    if (passwordInput instanceof HTMLInputElement) {
-      passwordInput.value = defaultAdminPassword;
-    }
-    setAuthStatus("Default admin credentials filled in sign-in form.", "info");
-  });
 }
 
 async function applySession(session) {

@@ -25,6 +25,9 @@ Practical authority website for residential construction guidance.
 3. In Supabase Auth -> Providers, enable Google and configure Google OAuth credentials.
 4. Open `/admin/index.html`, create your account with Sign Up, then sign in.
 
+If an existing admin account still fails with `email_not_confirmed`, run:
+- `/supabase/confirm-admin-user.sql`
+
 ## Environment variables
 
 1. Copy `.env.example` to `.env` and set:

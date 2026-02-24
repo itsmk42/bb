@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Content Manager | Builder Ballery</title>
   <meta name="robots" content="noindex,nofollow">
-  <link rel="stylesheet" href="/admin/styles.css?v=20260224-auth4">
+  <link rel="stylesheet" href="/admin/styles.css?v=20260224-auth5">
 </head>
 <body>
   <main class="admin-shell">
@@ -15,26 +15,20 @@
       <p><a href="/">Back to website</a></p>
     </header>
 
-    <section id="auth-panel" class="panel">
+    <section id="auth-panel" class="panel auth-shell">
       <h2>Admin Sign In</h2>
-      <p>Use authorized email and password to access the content manager.</p>
-      <div class="credential-card">
-        <p class="credential-label">Primary Admin Login</p>
-        <p><strong>Email:</strong> <code>builderjo@admin.com</code></p>
-        <p><strong>Password:</strong> <code>Ss@1234q</code></p>
-        <button id="use-default-login" class="btn btn-secondary" type="button">Use This Login</button>
-      </div>
+      <p>Use your authorized email and password to access the content manager.</p>
 
       <div class="auth-grid">
         <form id="signin-form" class="form-grid" novalidate>
           <h3>Sign In</h3>
           <label>
             Email
-            <input name="email" type="email" required autocomplete="email" placeholder="you@example.com" value="builderjo@admin.com">
+            <input name="email" type="email" required autocomplete="email" placeholder="you@example.com">
           </label>
           <label>
             Password
-            <input name="password" type="password" required autocomplete="current-password" minlength="6" placeholder="Enter password" value="Ss@1234q">
+            <input name="password" type="password" required autocomplete="current-password" minlength="6" placeholder="Enter password">
           </label>
           <button class="btn" type="submit">Sign In</button>
         </form>
@@ -140,6 +134,6 @@
 
   <script src="/assets/env-config.js?v=20260224-env1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/admin/app.js?v=20260224-auth4" defer></script>
+  <script src="/admin/app.js?v=20260224-auth5" defer></script>
 </body>
 </html>

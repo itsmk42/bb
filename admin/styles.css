@@ -100,30 +100,21 @@ h3 {
   background: linear-gradient(90deg, #6ca8ff 0%, #ffb72d 100%);
 }
 
-.credential-card {
-  margin-top: 0.9rem;
-  border: 1px solid rgba(121, 160, 197, 0.5);
-  border-radius: 12px;
-  padding: 0.75rem 0.85rem;
-  background: rgba(16, 29, 43, 0.7);
+.auth-shell {
+  width: min(560px, 100%);
+  margin-inline: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 42px rgba(2, 7, 12, 0.38);
 }
 
-.credential-label {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #a9c7e6;
+.auth-shell > h2 {
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
 }
 
-.credential-card p {
-  margin: 0.45rem 0 0;
-  color: #d6e3f0;
-}
-
-.credential-card .btn {
-  margin-top: 0.6rem;
+.auth-shell > p {
+  margin-top: 0.55rem;
+  margin-bottom: 1rem;
+  color: #b8c8d7;
 }
 
 .manager-head {
@@ -165,10 +156,14 @@ h3 {
 }
 
 .auth-grid > form {
-  border: 1px solid rgba(122, 148, 173, 0.44);
+  border: 1px solid rgba(132, 169, 203, 0.4);
   border-radius: 12px;
-  padding: 0.85rem;
-  background: rgba(12, 22, 33, 0.72);
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 85% 18%, rgba(108, 168, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008)),
+    rgba(12, 22, 33, 0.8);
+  backdrop-filter: blur(8px);
 }
 
 .auth-grid > form h3 {
@@ -302,7 +297,7 @@ code {
 
 @media (min-width: 760px) {
   .auth-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .manager-grid {
