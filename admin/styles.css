@@ -83,10 +83,6 @@ h3 {
   margin-top: 0.9rem;
 }
 
-.auth-actions {
-  margin-top: 0.9rem;
-}
-
 #auth-panel {
   position: relative;
   overflow: hidden;
@@ -235,29 +231,6 @@ textarea:focus-visible {
   border-color: #466182;
   background: #21344a;
   color: #e6eef7;
-}
-
-.btn-google {
-  border-color: #445a73;
-  background: #182736;
-  color: #deebf8;
-  width: 100%;
-  justify-content: center;
-}
-
-.btn-google::before {
-  content: "G";
-  display: inline-flex;
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 999px;
-  align-items: center;
-  justify-content: center;
-  margin-right: 0.5rem;
-  background: #ffffff;
-  color: #1c2e41;
-  font-weight: 800;
-  line-height: 1;
 }
 
 .btn-danger {

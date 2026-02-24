@@ -5,7 +5,6 @@ const supabaseKey = String(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
 ).trim();
 const storageBucket = String(config.SUPABASE_STORAGE_BUCKET || "documents").trim() || "documents";
-const oauthRedirectTo = `${window.location.origin}${window.location.pathname}`;
 const defaultAdminEmail = "builderjo@admin.com";
 const defaultAdminPassword = "Ss@1234q";
 
@@ -240,62 +239,20 @@ async function handleSignIn(event) {
 
   const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
   if (error) {
-    setAuthStatus(error.message, "error");
+    const message = String(error.message || "Sign in failed.");
+    if (error.code === "email_not_confirmed" || /email not confirmed|email not verified/i.test(message)) {
+      setAuthStatus(
+        "Email not verified. In Supabase: Authentication -> Providers -> Email, disable 'Confirm email' for admin login or verify this inbox first.",
+        "error"
+      );
+    } else {
+      setAuthStatus(message, "error");
+    }
     return;
   }
 
   form.reset();
   setAuthStatus("Signed in successfully.", "success");
-}
-
-async function handleSignUp(event) {
-  event.preventDefault();
-  setAuthStatus("", "info");
-
-  const form = event.currentTarget;
-  const formData = new FormData(form);
-  const email = String(formData.get("email") || "").trim();
-  const password = String(formData.get("password") || "").trim();
-
-  if (!email || !password) {
-    setAuthStatus("Email and password are required.", "error");
-    return;
-  }
-
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: oauthRedirectTo
-    }
-  });
-
-  if (error) {
-    setAuthStatus(error.message, "error");
-    return;
-  }
-
-  form.reset();
-
-  if (data.user && !data.session) {
-    setAuthStatus("Sign up successful. Check your email to verify and then sign in.", "success");
-  } else {
-    setAuthStatus("Account created and signed in.", "success");
-  }
-}
-
-async function handleGoogleOAuth() {
-  setAuthStatus("", "info");
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: oauthRedirectTo
-    }
-  });
-
-  if (error) {
-    setAuthStatus(error.message, "error");
-  }
 }
 
 async function handleSignOut() {
@@ -487,8 +444,6 @@ function wireManagerHandlers() {
 
 function wireAuthHandlers() {
   const signInForm = byId("signin-form");
-  const signUpForm = byId("signup-form");
-  const googleButton = byId("google-auth");
   const useDefaultLoginButton = byId("use-default-login");
 
   signInForm?.addEventListener("submit", async (event) => {
@@ -496,22 +451,6 @@ function wireAuthHandlers() {
       await handleSignIn(event);
     } catch (error) {
       setAuthStatus(`Sign in failed: ${error.message}`, "error");
-    }
-  });
-
-  signUpForm?.addEventListener("submit", async (event) => {
-    try {
-      await handleSignUp(event);
-    } catch (error) {
-      setAuthStatus(`Sign up failed: ${error.message}`, "error");
-    }
-  });
-
-  googleButton?.addEventListener("click", async () => {
-    try {
-      await handleGoogleOAuth();
-    } catch (error) {
-      setAuthStatus(`Google OAuth failed: ${error.message}`, "error");
     }
   });
 

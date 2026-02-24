@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Content Manager | Builder Ballery</title>
   <meta name="robots" content="noindex,nofollow">
-  <link rel="stylesheet" href="/admin/styles.css?v=20260224-auth3">
+  <link rel="stylesheet" href="/admin/styles.css?v=20260224-auth4">
 </head>
 <body>
   <main class="admin-shell">
@@ -16,8 +16,8 @@
     </header>
 
     <section id="auth-panel" class="panel">
-      <h2>Sign In Options</h2>
-      <p>Use email and password, create a new account, or continue with Google OAuth.</p>
+      <h2>Admin Sign In</h2>
+      <p>Use authorized email and password to access the content manager.</p>
       <div class="credential-card">
         <p class="credential-label">Primary Admin Login</p>
         <p><strong>Email:</strong> <code>builderjo@admin.com</code></p>
@@ -38,23 +38,6 @@
           </label>
           <button class="btn" type="submit">Sign In</button>
         </form>
-
-        <form id="signup-form" class="form-grid" novalidate>
-          <h3>Sign Up</h3>
-          <label>
-            Email
-            <input name="email" type="email" required autocomplete="email" placeholder="you@example.com">
-          </label>
-          <label>
-            Password
-            <input name="password" type="password" required autocomplete="new-password" minlength="6" placeholder="Minimum 6 characters">
-          </label>
-          <button class="btn btn-secondary" type="submit">Create Account</button>
-        </form>
-      </div>
-
-      <div class="auth-actions">
-        <button id="google-auth" class="btn btn-google" type="button">Continue with Google</button>
       </div>
 
       <p id="auth-status" class="status" aria-live="polite"></p>
@@ -147,8 +130,8 @@
       </div>
 
       <section class="subpanel subpanel-note">
-        <h3>Backend Requirements</h3>
-        <p>Supabase tables <code>videos</code> and <code>documents</code> plus public storage bucket <code>documents</code> are required. Google OAuth must be enabled in Supabase Auth providers.</p>
+          <h3>Backend Requirements</h3>
+          <p>Supabase tables <code>videos</code> and <code>documents</code> plus public storage bucket <code>documents</code> are required.</p>
       </section>
 
       <p id="manager-status" class="status" aria-live="polite"></p>
@@ -157,6 +140,6 @@
 
   <script src="/assets/env-config.js?v=20260224-env1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/admin/app.js?v=20260224-auth3" defer></script>
+  <script src="/admin/app.js?v=20260224-auth4" defer></script>
 </body>
 </html>
