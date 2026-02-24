@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /builder-ops-97029/
 
 Sitemap: https://builderballery.com/sitemap.xml

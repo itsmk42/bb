@@ -11,7 +11,7 @@ Practical authority website for residential construction guidance.
 - `/content/videos.json`: Video entries
 - `/content/documents.json`: Document entries
 - `/documents`: PDF storage
-- `/admin/index.html`: Authenticated content manager (Sign In, Sign Up, Google OAuth)
+- `/builder-ops-97029/index.html`: Secret authenticated content manager (email/password only)
 - `/admin/app.js`: Supabase auth, CRUD, and storage upload logic
 - `/supabase/setup.sql`: SQL setup for tables, storage bucket, and policies
 
@@ -20,10 +20,12 @@ Practical authority website for residential construction guidance.
 1. Open Supabase SQL Editor and run `/supabase/setup.sql`.
 2. In Supabase Auth -> URL Configuration, add site URL and redirect URL:
    - `https://builderballery.com`
-   - `https://builderballery.com/admin/index.html`
-   - `http://localhost:3000/admin/index.html` (for local testing)
-3. In Supabase Auth -> Providers, enable Google and configure Google OAuth credentials.
-4. Open `/admin/index.html`, create your account with Sign Up, then sign in.
+   - `https://builderballery.com/builder-ops-97029/`
+   - `http://localhost:3000/builder-ops-97029/` (for local testing)
+3. In Supabase Auth -> Providers -> Email:
+   - Keep `Disable new user signups` enabled.
+   - Keep Google/OAuth disabled for this admin flow.
+4. Create/maintain admin user `builderjo@admin.com` and sign in at `/builder-ops-97029/`.
 
 If an existing admin account still fails with `email_not_confirmed`, run:
 - `/supabase/confirm-admin-user.sql`
@@ -34,6 +36,7 @@ If an existing admin account still fails with `email_not_confirmed`, run:
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_STORAGE_BUCKET` (default `documents`)
+   - `ADMIN_EMAIL` (default `builderjo@admin.com`)
 2. Generate runtime config used by browser scripts:
 
 ```bash
@@ -42,7 +45,7 @@ node scripts/generate-env-config.mjs
 
 This updates `/assets/env-config.js`, which is loaded by both:
 - `/index.html`
-- `/admin/index.html`
+- `/builder-ops-97029/index.html`
 
 ## How content loading works
 
@@ -71,7 +74,7 @@ Example using FormSubmit:
 
 ## Content operations
 
-- Preferred method: use `/admin/index.html`.
+- Preferred method: use `/builder-ops-97029/`.
 - Fallback method: edit `/content/videos.json` and `/content/documents.json` directly.
 
 ## SEO

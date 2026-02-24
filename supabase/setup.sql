@@ -25,10 +25,17 @@ create table if not exists public.documents (
 alter table public.videos enable row level security;
 alter table public.documents enable row level security;
 
+-- Security: only the admin email should have write privileges.
+-- Keep this in sync with ADMIN_EMAIL in runtime config.
+drop policy if exists "Allow public read access on videos" on public.videos;
 drop policy if exists "Public read videos" on public.videos;
 drop policy if exists "Authenticated manage videos" on public.videos;
+drop policy if exists "Admin manage videos" on public.videos;
+
+drop policy if exists "Allow public read access on documents" on public.documents;
 drop policy if exists "Public read documents" on public.documents;
 drop policy if exists "Authenticated manage documents" on public.documents;
+drop policy if exists "Admin manage documents" on public.documents;
 
 create policy "Public read videos"
   on public.videos
@@ -36,12 +43,12 @@ create policy "Public read videos"
   to public
   using (true);
 
-create policy "Authenticated manage videos"
+create policy "Admin manage videos"
   on public.videos
   for all
   to authenticated
-  using (true)
-  with check (true);
+  using (lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com')
+  with check (lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com');
 
 create policy "Public read documents"
   on public.documents
@@ -49,12 +56,12 @@ create policy "Public read documents"
   to public
   using (true);
 
-create policy "Authenticated manage documents"
+create policy "Admin manage documents"
   on public.documents
   for all
   to authenticated
-  using (true)
-  with check (true);
+  using (lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com')
+  with check (lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com');
 
 insert into storage.buckets (id, name, public)
 values ('documents', 'documents', true)
@@ -65,6 +72,9 @@ drop policy if exists "Public read documents bucket" on storage.objects;
 drop policy if exists "Authenticated upload documents bucket" on storage.objects;
 drop policy if exists "Authenticated update documents bucket" on storage.objects;
 drop policy if exists "Authenticated delete documents bucket" on storage.objects;
+drop policy if exists "Admin upload documents bucket" on storage.objects;
+drop policy if exists "Admin update documents bucket" on storage.objects;
+drop policy if exists "Admin delete documents bucket" on storage.objects;
 
 create policy "Public read documents bucket"
   on storage.objects
@@ -72,21 +82,33 @@ create policy "Public read documents bucket"
   to public
   using (bucket_id = 'documents');
 
-create policy "Authenticated upload documents bucket"
+create policy "Admin upload documents bucket"
   on storage.objects
   for insert
   to authenticated
-  with check (bucket_id = 'documents');
+  with check (
+    bucket_id = 'documents'
+    and lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com'
+  );
 
-create policy "Authenticated update documents bucket"
+create policy "Admin update documents bucket"
   on storage.objects
   for update
   to authenticated
-  using (bucket_id = 'documents')
-  with check (bucket_id = 'documents');
+  using (
+    bucket_id = 'documents'
+    and lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com'
+  )
+  with check (
+    bucket_id = 'documents'
+    and lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com'
+  );
 
-create policy "Authenticated delete documents bucket"
+create policy "Admin delete documents bucket"
   on storage.objects
   for delete
   to authenticated
-  using (bucket_id = 'documents');
+  using (
+    bucket_id = 'documents'
+    and lower(coalesce(auth.jwt() ->> 'email', '')) = 'builderjo@admin.com'
+  );

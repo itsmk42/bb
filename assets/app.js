@@ -90,6 +90,50 @@ function normalizeInstagramEmbedUrl(input) {
   }
 }
 
+function normalizeInstagramPublicUrl(input) {
+  if (!input) return "";
+  const raw = String(input).trim();
+
+  try {
+    const parsed = raw.startsWith("http")
+      ? new URL(raw)
+      : new URL(`https://www.instagram.com/${raw.replace(/^\/+/, "")}`);
+
+    const hostname = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (hostname !== "instagram.com") return "";
+
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 2) return "";
+
+    const type = segments[0];
+    const id = segments[1];
+    if (!["reel", "p", "tv"].includes(type) || !id) return "";
+
+    return `https://www.instagram.com/${type}/${id}/`;
+  } catch {
+    return "";
+  }
+}
+
+function normalizeSafeUrl(input, { allowRelative = false } = {}) {
+  if (!input) return "";
+  const raw = String(input).trim();
+  if (!raw) return "";
+
+  if (allowRelative && raw.startsWith("/")) {
+    if (raw.startsWith("//")) return "";
+    return raw;
+  }
+
+  try {
+    const parsed = new URL(raw);
+    if (!["http:", "https:"].includes(parsed.protocol)) return "";
+    return parsed.toString();
+  } catch {
+    return "";
+  }
+}
+
 function formatDate(dateValue) {
   if (!dateValue) return "Date not set";
   const date = new Date(dateValue);
@@ -219,11 +263,12 @@ function renderVideos(videos, documents, preferredCategories) {
       summary.textContent = video.summary || "Summary not added yet.";
       card.appendChild(summary);
 
-      if (video.reelUrl) {
+      const publicReelUrl = normalizeInstagramPublicUrl(video.reelUrl);
+      if (publicReelUrl) {
         const fallbackLink = document.createElement("a");
-        fallbackLink.href = video.reelUrl;
+        fallbackLink.href = publicReelUrl;
         fallbackLink.target = "_blank";
-        fallbackLink.rel = "noopener";
+        fallbackLink.rel = "noopener noreferrer";
         fallbackLink.textContent = embedUrl ? "Watch on Instagram" : "Open reel";
         fallbackLink.className = "chip";
         card.appendChild(fallbackLink);
@@ -235,11 +280,12 @@ function renderVideos(videos, documents, preferredCategories) {
 
         video.relatedDocumentIds.forEach((id) => {
           const doc = docsById.get(id);
-          if (!doc || !doc.downloadUrl) return;
+          const safeDocUrl = normalizeSafeUrl(doc?.downloadUrl, { allowRelative: true });
+          if (!doc || !safeDocUrl) return;
           const link = document.createElement("a");
-          link.href = doc.downloadUrl;
+          link.href = safeDocUrl;
           link.target = "_blank";
-          link.rel = "noopener";
+          link.rel = "noopener noreferrer";
           link.textContent = `Related: ${doc.title}`;
           related.appendChild(link);
         });
@@ -275,6 +321,7 @@ function renderDocuments(documents) {
   });
 
   sorted.forEach((doc) => {
+    const safeDownloadUrl = normalizeSafeUrl(doc.downloadUrl, { allowRelative: true });
     const card = document.createElement("article");
     card.className = "doc-card";
 
@@ -296,20 +343,27 @@ function renderDocuments(documents) {
 
     const viewButton = document.createElement("a");
     viewButton.className = "btn btn-secondary";
-    viewButton.href = doc.downloadUrl || "#";
+    viewButton.href = safeDownloadUrl || "#";
     viewButton.target = "_blank";
-    viewButton.rel = "noopener";
+    viewButton.rel = "noopener noreferrer";
     viewButton.textContent = "View";
-    actions.appendChild(viewButton);
+    if (safeDownloadUrl) actions.appendChild(viewButton);
 
     const downloadButton = document.createElement("a");
     downloadButton.className = "btn";
-    downloadButton.href = doc.downloadUrl || "#";
+    downloadButton.href = safeDownloadUrl || "#";
     downloadButton.target = "_blank";
-    downloadButton.rel = "noopener";
+    downloadButton.rel = "noopener noreferrer";
     downloadButton.setAttribute("download", "");
     downloadButton.textContent = "Download";
-    actions.appendChild(downloadButton);
+    if (safeDownloadUrl) {
+      actions.appendChild(downloadButton);
+    } else {
+      const invalid = document.createElement("p");
+      invalid.className = "doc-invalid-link";
+      invalid.textContent = "Download link unavailable.";
+      actions.appendChild(invalid);
+    }
 
     card.appendChild(actions);
     root.appendChild(card);
@@ -321,13 +375,14 @@ function configureForm(site) {
   const help = byId("form-help");
   if (!form || !help) return;
 
-  const endpoint = site?.inquiryEndpoint || "";
-  if (!endpoint) {
+  const endpoint = String(site?.inquiryEndpoint || "").trim();
+  const safeEndpoint = normalizeSafeUrl(endpoint);
+  if (!safeEndpoint) {
     help.textContent = "Set inquiryEndpoint in /content/site.json to receive form submissions by email.";
     return;
   }
 
-  form.action = endpoint;
+  form.action = safeEndpoint;
 
   if (site?.inquirySuccessRedirect) {
     const next = document.createElement("input");
@@ -337,7 +392,7 @@ function configureForm(site) {
     form.appendChild(next);
   }
 
-  if (endpoint.includes("YOUR_EMAIL") || endpoint.includes("your-email")) {
+  if (safeEndpoint.includes("YOUR_EMAIL") || safeEndpoint.includes("your-email")) {
     help.textContent = "Update inquiryEndpoint in /content/site.json with your actual email endpoint before going live.";
   } else {
     help.textContent = "After submit, details are delivered to your configured email endpoint.";
@@ -395,8 +450,11 @@ function configureWhatsApp(site) {
     site?.whatsappLink ||
       "https://wa.me/919008697029?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
   ).trim();
+  const safeLink = normalizeSafeUrl(link);
 
-  button.href = link;
+  if (safeLink) {
+    button.href = safeLink;
+  }
 }
 
 async function init() {

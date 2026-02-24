@@ -793,6 +793,12 @@ textarea:focus-visible {
   padding-inline: 1rem;
 }
 
+.doc-invalid-link {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-700);
+}
+
 .empty-state {
   border: 2px dashed var(--steel-300);
   padding: 2rem;

@@ -5,6 +5,7 @@ const supabaseKey = String(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
 ).trim();
 const storageBucket = String(config.SUPABASE_STORAGE_BUCKET || "documents").trim() || "documents";
+const adminEmail = String(config.ADMIN_EMAIL || "builderjo@admin.com").trim().toLowerCase();
 
 const supabaseClient = window.supabase?.createClient
   ? supabaseUrl && supabaseKey
@@ -34,6 +35,59 @@ function makeSlug(text) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isAuthorizedAdmin(user) {
+  const email = normalizeEmail(user?.email);
+  return Boolean(email) && email === adminEmail;
+}
+
+function normalizeInstagramUrl(input) {
+  if (!input) return "";
+  const raw = String(input).trim();
+
+  try {
+    const parsed = raw.startsWith("http")
+      ? new URL(raw)
+      : new URL(`https://www.instagram.com/${raw.replace(/^\/+/, "")}`);
+
+    const hostname = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (hostname !== "instagram.com") return "";
+
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 2) return "";
+
+    const type = segments[0];
+    const id = segments[1];
+    if (!["reel", "p", "tv"].includes(type) || !id) return "";
+
+    return `https://www.instagram.com/${type}/${id}/`;
+  } catch {
+    return "";
+  }
+}
+
+function normalizePublicDownloadUrl(input) {
+  if (!input) return "";
+  const raw = String(input).trim();
+  if (!raw) return "";
+
+  if (raw.startsWith("/")) {
+    if (raw.startsWith("//")) return "";
+    return raw;
+  }
+
+  try {
+    const parsed = new URL(raw);
+    if (!["http:", "https:"].includes(parsed.protocol)) return "";
+    return parsed.toString();
+  } catch {
+    return "";
+  }
 }
 
 function normalizeRelatedDocumentIds(value) {
@@ -123,12 +177,17 @@ function renderVideos() {
   }
 
   videos.forEach((video, index) => {
+    const reelHref = normalizeInstagramUrl(video.reelUrl);
+    const reelMarkup = reelHref
+      ? `<a href="${escapeHtml(reelHref)}" target="_blank" rel="noopener noreferrer">Open</a>`
+      : "Invalid URL";
+
     const item = document.createElement("article");
     item.className = "list-item";
     item.innerHTML = `
       <strong>${escapeHtml(video.title)}</strong>
       <p><span>Category:</span> ${escapeHtml(video.category)}</p>
-      <p><span>Reel:</span> <a href="${escapeHtml(video.reelUrl)}" target="_blank" rel="noopener">Open</a></p>
+      <p><span>Reel:</span> ${reelMarkup}</p>
       <p>${escapeHtml(video.summary)}</p>
       <p><span>Related docs:</span> ${escapeHtml((video.relatedDocumentIds || []).join(", ") || "None")}</p>
       <div class="list-actions">
@@ -150,6 +209,11 @@ function renderDocuments() {
   }
 
   documents.forEach((doc, index) => {
+    const downloadHref = normalizePublicDownloadUrl(doc.downloadUrl);
+    const downloadMarkup = downloadHref
+      ? `<a href="${escapeHtml(downloadHref)}" target="_blank" rel="noopener noreferrer">Open file</a>`
+      : "Invalid URL";
+
     const item = document.createElement("article");
     item.className = "list-item";
     item.innerHTML = `
@@ -157,7 +221,7 @@ function renderDocuments() {
       <p><span>ID:</span> ${escapeHtml(doc.id)}</p>
       <p><span>Date:</span> ${escapeHtml(formatDate(doc.date))}</p>
       <p>${escapeHtml(doc.description)}</p>
-      <p><span>Download:</span> <a href="${escapeHtml(doc.downloadUrl)}" target="_blank" rel="noopener">Open file</a></p>
+      <p><span>Download:</span> ${downloadMarkup}</p>
       <div class="list-actions">
         <button class="btn btn-danger" type="button" data-action="delete-doc" data-index="${index}">Delete</button>
       </div>
@@ -235,7 +299,7 @@ async function handleSignIn(event) {
     return;
   }
 
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
   if (error) {
     const message = String(error.message || "Sign in failed.");
     if (error.code === "email_not_confirmed" || /email not confirmed|email not verified/i.test(message)) {
@@ -246,6 +310,12 @@ async function handleSignIn(event) {
     } else {
       setAuthStatus(message, "error");
     }
+    return;
+  }
+
+  if (!isAuthorizedAdmin(data?.user)) {
+    await supabaseClient.auth.signOut();
+    setAuthStatus("This account is not authorized for content management.", "error");
     return;
   }
 
@@ -268,17 +338,23 @@ async function handleVideoSubmit(event) {
 
   const form = event.currentTarget;
   const formData = new FormData(form);
+  const normalizedReelUrl = normalizeInstagramUrl(formData.get("reelUrl"));
 
   const payload = {
     title: String(formData.get("title") || "").trim(),
     category: String(formData.get("category") || "").trim(),
-    reelUrl: String(formData.get("reelUrl") || "").trim(),
+    reelUrl: normalizedReelUrl,
     summary: String(formData.get("summary") || "").trim(),
     relatedDocumentIds: normalizeRelatedDocumentIds(formData.get("relatedDocumentIds"))
   };
 
-  if (!payload.title || !payload.category || !payload.reelUrl || !payload.summary) {
-    setManagerStatus("All video fields are required.", "error");
+  if (!payload.title || !payload.category || !payload.summary) {
+    setManagerStatus("Title, category, and summary are required.", "error");
+    return;
+  }
+
+  if (!normalizedReelUrl) {
+    setManagerStatus("Use a valid Instagram Reel/Post URL.", "error");
     return;
   }
 
@@ -304,7 +380,8 @@ async function handleDocumentSubmit(event) {
   const rawDescription = String(formData.get("description") || "").trim();
   const rawDate = String(formData.get("date") || "").trim();
   const file = formData.get("file");
-  const manualUrl = String(formData.get("downloadUrl") || "").trim();
+  const manualUrlInput = String(formData.get("downloadUrl") || "").trim();
+  const manualUrl = normalizePublicDownloadUrl(manualUrlInput);
 
   let title = rawTitle;
   if (!title && file instanceof File && file.size > 0 && file.name) {
@@ -319,6 +396,11 @@ async function handleDocumentSubmit(event) {
 
   if (!title) {
     setManagerStatus("Document title is required (or upload a file with a filename).", "error");
+    return;
+  }
+
+  if (manualUrlInput && !manualUrl) {
+    setManagerStatus("Direct download URL must start with https://, http://, or /", "error");
     return;
   }
 
@@ -462,6 +544,13 @@ function wireAuthHandlers() {
 }
 
 async function applySession(session) {
+  if (session?.user && !isAuthorizedAdmin(session.user)) {
+    await supabaseClient.auth.signOut();
+    toggleManager(null);
+    setAuthStatus("This account is not authorized for content management.", "error");
+    return;
+  }
+
   toggleManager(session);
 
   if (session?.user) {

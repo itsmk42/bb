@@ -38,7 +38,8 @@ const env = parseEnv(fs.readFileSync(sourcePath, "utf8"));
 const config = {
   SUPABASE_URL: env.SUPABASE_URL || "",
   SUPABASE_ANON_KEY: env.SUPABASE_ANON_KEY || "",
-  SUPABASE_STORAGE_BUCKET: env.SUPABASE_STORAGE_BUCKET || "documents"
+  SUPABASE_STORAGE_BUCKET: env.SUPABASE_STORAGE_BUCKET || "documents",
+  ADMIN_EMAIL: env.ADMIN_EMAIL || "builderjo@admin.com"
 };
 
 const content = `window.BUILDERBALLERY_CONFIG = Object.freeze(${JSON.stringify(config, null, 2)});\n`;
