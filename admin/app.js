@@ -300,17 +300,25 @@ async function handleDocumentSubmit(event) {
   const form = event.currentTarget;
   const formData = new FormData(form);
 
-  const title = String(formData.get("title") || "").trim();
-  const description = String(formData.get("description") || "").trim();
-  const date = String(formData.get("date") || "").trim();
+  const rawTitle = String(formData.get("title") || "").trim();
+  const rawDescription = String(formData.get("description") || "").trim();
+  const rawDate = String(formData.get("date") || "").trim();
   const file = formData.get("file");
   const manualUrl = String(formData.get("downloadUrl") || "").trim();
+
+  let title = rawTitle;
+  if (!title && file instanceof File && file.size > 0 && file.name) {
+    title = file.name.replace(/\.[^.]+$/, "").trim();
+  }
+
+  const description = rawDescription || "Technical reference document uploaded from Content Manager.";
+  const date = rawDate || new Date().toISOString().slice(0, 10);
 
   const generatedId = `doc-${makeSlug(title)}-${Date.now().toString().slice(-5)}`;
   const id = String(formData.get("id") || "").trim() || generatedId;
 
-  if (!title || !description || !date) {
-    setManagerStatus("Title, description, and date are required for documents.", "error");
+  if (!title) {
+    setManagerStatus("Document title is required (or upload a file with a filename).", "error");
     return;
   }
 
