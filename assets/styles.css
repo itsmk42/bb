@@ -248,7 +248,7 @@ body {
 }
 
 .hero {
-  padding-top: 5rem;
+  padding-top: 1.25rem;
 }
 
 .hero-layout {
@@ -1018,7 +1018,7 @@ textarea:focus-visible {
 
 @media (min-width: 1060px) {
   .hero {
-    padding-top: 6rem;
+    padding-top: 1.75rem;
   }
 
   .hero-main {
