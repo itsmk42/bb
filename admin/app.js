@@ -240,7 +240,7 @@ async function handleSignIn(event) {
     const message = String(error.message || "Sign in failed.");
     if (error.code === "email_not_confirmed" || /email not confirmed|email not verified/i.test(message)) {
       setAuthStatus(
-        "Email still not verified for this account. In Supabase go to Authentication -> Users -> builderjo@admin.com and confirm the user (or run SQL to set email_confirmed_at).",
+        "Email verification is still pending for this account. Confirm the user in Supabase Authentication -> Users, then refresh and try again.",
         "error"
       );
     } else {
