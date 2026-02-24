@@ -5,7 +5,7 @@ const supabaseKey = String(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
 ).trim();
 const storageBucket = String(config.SUPABASE_STORAGE_BUCKET || "documents").trim() || "documents";
-const oauthRedirectTo = `${window.location.origin}/admin/index.html`;
+const oauthRedirectTo = `${window.location.origin}${window.location.pathname}`;
 const defaultAdminEmail = "builderjo@admin.com";
 const defaultAdminPassword = "Ss@1234q";
 
