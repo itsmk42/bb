@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "id": "doc-approval-bbmp-checklist",
+    "title": "BBMP Residential Plan Approval Checklist",
+    "description": "Practical pre-submission checklist for residential plan approvals: ownership records, dimensions, setbacks, drawing completeness, and basic structural sign-offs.",
+    "date": "2026-02-24",
+    "downloadUrl": "/documents/bbmp-plan-approval-checklist.pdf"
+  },
+  {
+    "id": "doc-rera-homebuyer-essentials",
+    "title": "RERA Homebuyer Essentials (Quick Reference)",
+    "description": "A short document for families to verify project registration, approval transparency, milestone-based payments, and documented communication.",
+    "date": "2026-02-24",
+    "downloadUrl": "/documents/rera-homebuyer-essentials.pdf"
+  },
+  {
+    "id": "doc-foundation-rock-safety",
+    "title": "Foundation Rock Excavation Safety Checklist",
+    "description": "Step-by-step controls for using controlled rock cracking methods near residential buildings, including PPE, drilling pattern checks, and post-activity inspection.",
+    "date": "2026-02-24",
+    "downloadUrl": "/documents/foundation-rock-excavation-safety.pdf"
+  },
+  {
+    "id": "doc-toilet-layout-tech",
+    "title": "Toilet Layout Technical Checklist",
+    "description": "Execution checklist for toilet dimensions, fixture placement, drainage slope, waterproofing, and ventilation to avoid expensive rework.",
+    "date": "2026-02-24",
+    "downloadUrl": "/documents/toilet-layout-technical-checklist.pdf"
+  },
+  {
+    "id": "doc-kitchen-platform-ergonomics",
+    "title": "Kitchen Platform Ergonomics Guide",
+    "description": "Reference guide for platform height and width, sink-stove-workflow spacing, service points, and daily comfort in residential kitchens.",
+    "date": "2026-02-24",
+    "downloadUrl": "/documents/kitchen-platform-ergonomics.pdf"
+  },
+  {
+    "id": "doc-pre-handover-snag-list",
+    "title": "Pre-Handover Residential Snag Checklist",
+    "description": "Final-stage room-wise snag checklist covering finishes, plumbing, electrical points, safety items, and handover records.",
+    "date": "2026-02-24",
+    "downloadUrl": "/documents/pre-handover-snag-checklist.pdf"
+  }
+]

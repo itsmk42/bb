@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "title": "Controlled Rock Cracking for Foundations",
+    "category": "Structural",
+    "reelUrl": "https://www.instagram.com/reel/DSzr_Q4AQrM/",
+    "summary": "Explains controlled rock cracking powder as an alternative to blasting during foundation excavation. Focus is on risk reduction near existing homes and safe execution basics.",
+    "relatedDocumentIds": ["doc-foundation-rock-safety"]
+  },
+  {
+    "title": "Brick vs Block in Residential Construction",
+    "category": "Materials",
+    "reelUrl": "https://www.instagram.com/reel/DVBR7Mfk7jM/",
+    "summary": "Compares brick masonry and block work from practical site experience. Covers long-term durability, moisture behavior, and reliability for home construction.",
+    "relatedDocumentIds": ["doc-approval-bbmp-checklist"]
+  },
+  {
+    "title": "Toilet Planning: Vastu and Technical Execution",
+    "category": "Site Execution",
+    "reelUrl": "https://www.instagram.com/reel/DU0a5L0k9Ri/",
+    "summary": "Shows how toilet location decisions should be paired with technical detailing. Includes fixture positioning, ventilation, and drainage slope for long-term performance.",
+    "relatedDocumentIds": ["doc-toilet-layout-tech"]
+  },
+  {
+    "title": "Kitchen Planning: Comfort Over Blind Rules",
+    "category": "Buying Mistakes",
+    "reelUrl": "https://www.instagram.com/reel/DUqFAfdgedj/",
+    "summary": "Highlights a common homeowner mistake: prioritizing direction alone while ignoring platform ergonomics. Emphasizes usable height and layout for daily comfort.",
+    "relatedDocumentIds": ["doc-kitchen-platform-ergonomics"]
+  },
+  {
+    "title": "Handle Vastu in Planning Stage, Not During Rework",
+    "category": "Documentation",
+    "reelUrl": "https://www.instagram.com/reel/DUk562FARuX/",
+    "summary": "Discusses why major changes during construction create delays, cost escalation, and coordination issues. Pushes for early planning decisions with documented sign-off.",
+    "relatedDocumentIds": ["doc-rera-homebuyer-essentials", "doc-approval-bbmp-checklist"]
+  },
+  {
+    "title": "Site Reality: Productivity and Labor Coordination",
+    "category": "Site Execution",
+    "reelUrl": "https://www.instagram.com/reel/DUvMoM7E9g0/",
+    "summary": "Captures a daily site challenge: waiting time and workforce coordination impact execution speed. Useful reminder for schedule planning and activity sequencing.",
+    "relatedDocumentIds": ["doc-pre-handover-snag-list"]
+  }
+]

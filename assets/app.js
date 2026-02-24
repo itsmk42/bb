@@ -2,6 +2,13 @@ const SITE_PATH = "/content/site.json";
 const VIDEOS_PATH = "/content/videos.json";
 const DOCUMENTS_PATH = "/content/documents.json";
 
+// Initialize Supabase Client
+const supabaseUrl = 'https://onahtndmilugzhjwjtam.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U';
+// The object exposed by the CDN is window.supabase
+const supabaseClient = window.supabase?.createClient
+  ? window.supabase.createClient(supabaseUrl, supabaseKey)
+  : null;
 function byId(id) {
   return document.getElementById(id);
 }
@@ -41,6 +48,17 @@ async function fetchJson(path, fallback) {
     return await response.json();
   } catch {
     return fallback;
+  }
+}
+
+async function fetchSupabaseRows(tableName) {
+  if (!supabaseClient) return [];
+  try {
+    const { data, error } = await supabaseClient.from(tableName).select("*");
+    if (error) return [];
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
   }
 }
 
@@ -294,19 +312,38 @@ function configureMobileMenu() {
   }
 }
 
+function configureWhatsApp(site) {
+  const button = byId("whatsapp-float");
+  if (!button) return;
+
+  const link = String(
+    site?.whatsappLink ||
+      "https://wa.me/919000000000?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
+  ).trim();
+
+  button.href = link;
+}
+
 async function init() {
   configureMobileMenu();
 
-  const [site, videos, documents] = await Promise.all([
+  const [siteResponse, fallbackVideos, fallbackDocuments, dbVideos, dbDocuments] = await Promise.all([
     fetchJson(SITE_PATH, {}),
     fetchJson(VIDEOS_PATH, []),
-    fetchJson(DOCUMENTS_PATH, [])
+    fetchJson(DOCUMENTS_PATH, []),
+    fetchSupabaseRows("videos"),
+    fetchSupabaseRows("documents")
   ]);
+
+  const site = siteResponse;
+  const videos = dbVideos.length > 0 ? dbVideos : fallbackVideos;
+  const documents = dbDocuments.length > 0 ? dbDocuments : fallbackDocuments;
 
   setHomeCopy(site);
   renderVideos(videos, documents, site.defaultVideoCategories || []);
   renderDocuments(documents);
   configureForm(site);
+  configureWhatsApp(site);
 
   const year = byId("year");
   if (year) year.textContent = String(new Date().getFullYear());
