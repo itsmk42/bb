@@ -6,6 +6,8 @@ const supabaseKey = String(
 ).trim();
 const storageBucket = String(config.SUPABASE_STORAGE_BUCKET || "documents").trim() || "documents";
 const oauthRedirectTo = `${window.location.origin}/admin/index.html`;
+const defaultAdminEmail = "builderjo@admin.com";
+const defaultAdminPassword = "Ss@1234q";
 
 const supabaseClient = window.supabase?.createClient
   ? supabaseUrl && supabaseKey
@@ -487,6 +489,7 @@ function wireAuthHandlers() {
   const signInForm = byId("signin-form");
   const signUpForm = byId("signup-form");
   const googleButton = byId("google-auth");
+  const useDefaultLoginButton = byId("use-default-login");
 
   signInForm?.addEventListener("submit", async (event) => {
     try {
@@ -510,6 +513,20 @@ function wireAuthHandlers() {
     } catch (error) {
       setAuthStatus(`Google OAuth failed: ${error.message}`, "error");
     }
+  });
+
+  useDefaultLoginButton?.addEventListener("click", () => {
+    if (!(signInForm instanceof HTMLFormElement)) return;
+    const emailInput = signInForm.elements.namedItem("email");
+    const passwordInput = signInForm.elements.namedItem("password");
+
+    if (emailInput instanceof HTMLInputElement) {
+      emailInput.value = defaultAdminEmail;
+    }
+    if (passwordInput instanceof HTMLInputElement) {
+      passwordInput.value = defaultAdminPassword;
+    }
+    setAuthStatus("Default admin credentials filled in sign-in form.", "info");
   });
 }
 
