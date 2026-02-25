@@ -136,6 +136,48 @@ function normalizeSafeUrl(input, { allowRelative = false } = {}) {
   }
 }
 
+function buildMaskedDocumentPath(doc) {
+  const slug = makeSlug(doc?.title || doc?.id || "document");
+  return `/documents/${slug || "document"}`;
+}
+
+function extractUrlFilename(url) {
+  try {
+    const parsed = new URL(url, window.location.origin);
+    const segment = decodeURIComponent(parsed.pathname.split("/").pop() || "").trim();
+    return segment || "document";
+  } catch {
+    return "document";
+  }
+}
+
+function buildDownloadFilename(doc, url) {
+  const fallback = extractUrlFilename(url);
+  const titleSlug = makeSlug(doc?.title || "");
+  if (!titleSlug) return fallback;
+
+  const extensionMatch = fallback.match(/\.([a-z0-9]{1,8})$/i);
+  if (!extensionMatch) return titleSlug;
+  return `${titleSlug}.${extensionMatch[1].toLowerCase()}`;
+}
+
+async function downloadDocumentToDevice(url, fileName) {
+  const response = await fetch(url, { credentials: "omit" });
+  if (!response.ok) {
+    throw new Error(`Download failed (${response.status})`);
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = fileName || "document";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+}
+
 function formatDate(dateValue) {
   if (!dateValue) return "Date not set";
   const date = new Date(dateValue);
@@ -348,6 +390,7 @@ function renderDocuments(documents) {
 
   sorted.forEach((doc) => {
     const safeDownloadUrl = normalizeSafeUrl(doc.downloadUrl, { allowRelative: true });
+    const maskedPath = buildMaskedDocumentPath(doc);
     const card = document.createElement("article");
     card.className = "doc-card";
 
@@ -369,18 +412,18 @@ function renderDocuments(documents) {
 
     const viewButton = document.createElement("a");
     viewButton.className = "btn btn-secondary";
-    viewButton.href = safeDownloadUrl || "#";
-    viewButton.target = "_blank";
-    viewButton.rel = "noopener noreferrer";
+    viewButton.href = maskedPath;
+    viewButton.dataset.docAction = "view";
+    viewButton.dataset.docUrl = safeDownloadUrl;
     viewButton.textContent = "View";
     if (safeDownloadUrl) actions.appendChild(viewButton);
 
     const downloadButton = document.createElement("a");
     downloadButton.className = "btn";
-    downloadButton.href = safeDownloadUrl || "#";
-    downloadButton.target = "_blank";
-    downloadButton.rel = "noopener noreferrer";
-    downloadButton.setAttribute("download", "");
+    downloadButton.href = `${maskedPath}?download=1`;
+    downloadButton.dataset.docAction = "download";
+    downloadButton.dataset.docUrl = safeDownloadUrl;
+    downloadButton.dataset.docFilename = buildDownloadFilename(doc, safeDownloadUrl);
     downloadButton.textContent = "Download";
     if (safeDownloadUrl) {
       actions.appendChild(downloadButton);
@@ -495,9 +538,39 @@ function configureTopButton() {
   window.addEventListener("scroll", updateVisibility, { passive: true });
 }
 
+function wireDocumentActions() {
+  document.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const link = target.closest("a[data-doc-action]");
+    if (!(link instanceof HTMLAnchorElement)) return;
+
+    const url = String(link.dataset.docUrl || "").trim();
+    const action = String(link.dataset.docAction || "").trim();
+    if (!url) return;
+
+    event.preventDefault();
+
+    if (action === "view") {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (action === "download") {
+      const fileName = String(link.dataset.docFilename || "document").trim();
+      try {
+        await downloadDocumentToDevice(url, fileName);
+      } catch {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    }
+  });
+}
+
 async function init() {
   resetToHeroOnReload();
   configureMobileMenu();
+  wireDocumentActions();
 
   const [siteResponse, fallbackVideos, fallbackDocuments, dbVideos, dbDocuments] = await Promise.all([
     fetchJson(SITE_PATH, {}),
