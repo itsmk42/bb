@@ -233,9 +233,9 @@ body {
 }
 
 .site-nav a.nav-cta {
-  border-color: rgba(245, 158, 11, 0.75);
-  background: rgba(245, 158, 11, 0.12);
-  color: #ffdba4;
+  border-color: rgba(193, 205, 216, 0.45);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--steel-100);
 }
 
 .site-header.menu-open .site-nav {
@@ -984,8 +984,8 @@ textarea:focus-visible {
   }
 
   .site-nav a.nav-cta {
-    border-color: rgba(245, 158, 11, 0.55);
-    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(193, 205, 216, 0.35);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .site-nav a:hover,
