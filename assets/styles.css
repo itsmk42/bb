@@ -1338,3 +1338,120 @@ body {
     font-size: 0.74rem;
   }
 }
+
+/* Video filter usability */
+.chip-row {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chip-row .chip {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  white-space: nowrap;
+}
+
+.chip-filter {
+  appearance: none;
+  cursor: pointer;
+}
+
+.chip-filter.is-active {
+  background: var(--ink-900);
+  color: var(--signal);
+  border-color: var(--ink-900);
+}
+
+.chip-row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.chip-row::-webkit-scrollbar-thumb {
+  background: rgba(140, 155, 173, 0.45);
+  border-radius: 999px;
+}
+
+/* Floating actions: icon only */
+.whatsapp-float {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  padding: 0;
+  gap: 0;
+}
+
+.wa-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.top-float {
+  position: fixed;
+  right: 1rem;
+  bottom: 4.9rem;
+  z-index: 89;
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(193, 205, 216, 0.45);
+  border-radius: 999px;
+  background: rgba(8, 14, 20, 0.9);
+  color: var(--steel-100);
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.top-float.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.top-float:hover,
+.top-float:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hard);
+}
+
+.top-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 540px) {
+  .whatsapp-float {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+  }
+
+  .wa-icon {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+
+  .top-float {
+    right: 0.75rem;
+    bottom: 4.3rem;
+    width: 52px;
+    height: 52px;
+  }
+}

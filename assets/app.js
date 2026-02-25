@@ -15,6 +15,8 @@ const supabaseClient = window.supabase?.createClient
     ? window.supabase.createClient(supabaseUrl, supabaseKey)
     : null
   : null;
+
+let activeVideoCategory = "";
 function byId(id) {
   return document.getElementById(id);
 }
@@ -179,16 +181,24 @@ function setHomeCopy(site) {
   }
 }
 
-function renderVideoCategoriesNav(categories) {
+function renderVideoCategoriesNav(categories, activeCategory, onSelect) {
   const nav = byId("video-category-nav");
   if (!nav) return;
   nav.innerHTML = "";
+  if (!Array.isArray(categories) || categories.length === 0) return;
+
   categories.forEach((category) => {
-    const link = document.createElement("a");
-    link.className = "chip";
-    link.href = `#cat-${makeSlug(category)}`;
-    link.textContent = category;
-    nav.appendChild(link);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `chip chip-filter${category === activeCategory ? " is-active" : ""}`;
+    button.textContent = category;
+    button.setAttribute("aria-pressed", String(category === activeCategory));
+    button.addEventListener("click", () => {
+      if (typeof onSelect === "function") {
+        onSelect(category, button);
+      }
+    });
+    nav.appendChild(button);
   });
 }
 
@@ -202,7 +212,7 @@ function renderVideos(videos, documents, preferredCategories) {
     empty.className = "empty-state";
     empty.textContent = "No reels added yet. Open Content Manager to add Instagram video entries by category.";
     root.appendChild(empty);
-    renderVideoCategoriesNav(preferredCategories || []);
+    renderVideoCategoriesNav(preferredCategories || [], "", null);
     return;
   }
 
@@ -220,85 +230,101 @@ function renderVideos(videos, documents, preferredCategories) {
   const remaining = discovered.filter((name) => !preferred.includes(name));
   const orderedCategories = [...preferred, ...remaining];
 
-  renderVideoCategoriesNav(orderedCategories);
+  if (!activeVideoCategory || !grouped.has(activeVideoCategory)) {
+    activeVideoCategory = orderedCategories[0] || "";
+  }
 
-  orderedCategories.forEach((category) => {
-    const section = document.createElement("section");
-    section.className = "video-category";
-    section.id = `cat-${makeSlug(category)}`;
-
-    const title = document.createElement("h3");
-    title.textContent = category;
-    section.appendChild(title);
-
-    const grid = document.createElement("div");
-    grid.className = "video-grid";
-
-    grouped.get(category).forEach((video) => {
-      const card = document.createElement("article");
-      card.className = "video-card";
-
-      const iframe = document.createElement("iframe");
-      iframe.className = "video-frame";
-      iframe.loading = "lazy";
-      iframe.allowFullscreen = true;
-      iframe.setAttribute(
-        "allow",
-        "autoplay; encrypted-media; picture-in-picture; clipboard-write; web-share"
-      );
-      iframe.referrerPolicy = "strict-origin-when-cross-origin";
-      iframe.scrolling = "no";
-      iframe.title = video.title || `${category} reel`;
-      const embedUrl = normalizeInstagramEmbedUrl(video.reelUrl);
-      if (embedUrl) {
-        iframe.src = embedUrl;
-      }
-      card.appendChild(iframe);
-
-      const videoTitle = document.createElement("h4");
-      videoTitle.textContent = video.title || "Construction Reel";
-      card.appendChild(videoTitle);
-
-      const summary = document.createElement("p");
-      summary.textContent = video.summary || "Summary not added yet.";
-      card.appendChild(summary);
-
-      const publicReelUrl = normalizeInstagramPublicUrl(video.reelUrl);
-      if (publicReelUrl) {
-        const fallbackLink = document.createElement("a");
-        fallbackLink.href = publicReelUrl;
-        fallbackLink.target = "_blank";
-        fallbackLink.rel = "noopener noreferrer";
-        fallbackLink.textContent = embedUrl ? "Watch on Instagram" : "Open reel";
-        fallbackLink.className = "chip";
-        card.appendChild(fallbackLink);
-      }
-
-      if (Array.isArray(video.relatedDocumentIds) && video.relatedDocumentIds.length > 0) {
-        const related = document.createElement("div");
-        related.className = "related-docs";
-
-        video.relatedDocumentIds.forEach((id) => {
-          const doc = docsById.get(id);
-          const safeDocUrl = normalizeSafeUrl(doc?.downloadUrl, { allowRelative: true });
-          if (!doc || !safeDocUrl) return;
-          const link = document.createElement("a");
-          link.href = safeDocUrl;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = `Related: ${doc.title}`;
-          related.appendChild(link);
-        });
-
-        if (related.childNodes.length > 0) card.appendChild(related);
-      }
-
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    root.appendChild(section);
+  renderVideoCategoriesNav(orderedCategories, activeVideoCategory, (category, button) => {
+    if (category === activeVideoCategory) return;
+    activeVideoCategory = category;
+    renderVideos(videos, documents, preferredCategories);
+    button?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   });
+
+  if (!activeVideoCategory || !grouped.has(activeVideoCategory)) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No reels available in this category.";
+    root.appendChild(empty);
+    return;
+  }
+
+  const category = activeVideoCategory;
+  const section = document.createElement("section");
+  section.className = "video-category";
+  section.id = `cat-${makeSlug(category)}`;
+
+  const title = document.createElement("h3");
+  title.textContent = category;
+  section.appendChild(title);
+
+  const grid = document.createElement("div");
+  grid.className = "video-grid";
+
+  grouped.get(category).forEach((video) => {
+    const card = document.createElement("article");
+    card.className = "video-card";
+
+    const iframe = document.createElement("iframe");
+    iframe.className = "video-frame";
+    iframe.loading = "lazy";
+    iframe.allowFullscreen = true;
+    iframe.setAttribute(
+      "allow",
+      "autoplay; encrypted-media; picture-in-picture; clipboard-write; web-share"
+    );
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    iframe.scrolling = "no";
+    iframe.title = video.title || `${category} reel`;
+    const embedUrl = normalizeInstagramEmbedUrl(video.reelUrl);
+    if (embedUrl) {
+      iframe.src = embedUrl;
+    }
+    card.appendChild(iframe);
+
+    const videoTitle = document.createElement("h4");
+    videoTitle.textContent = video.title || "Construction Reel";
+    card.appendChild(videoTitle);
+
+    const summary = document.createElement("p");
+    summary.textContent = video.summary || "Summary not added yet.";
+    card.appendChild(summary);
+
+    const publicReelUrl = normalizeInstagramPublicUrl(video.reelUrl);
+    if (publicReelUrl) {
+      const fallbackLink = document.createElement("a");
+      fallbackLink.href = publicReelUrl;
+      fallbackLink.target = "_blank";
+      fallbackLink.rel = "noopener noreferrer";
+      fallbackLink.textContent = embedUrl ? "Watch on Instagram" : "Open reel";
+      fallbackLink.className = "chip";
+      card.appendChild(fallbackLink);
+    }
+
+    if (Array.isArray(video.relatedDocumentIds) && video.relatedDocumentIds.length > 0) {
+      const related = document.createElement("div");
+      related.className = "related-docs";
+
+      video.relatedDocumentIds.forEach((id) => {
+        const doc = docsById.get(id);
+        const safeDocUrl = normalizeSafeUrl(doc?.downloadUrl, { allowRelative: true });
+        if (!doc || !safeDocUrl) return;
+        const link = document.createElement("a");
+        link.href = safeDocUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = `Related: ${doc.title}`;
+        related.appendChild(link);
+      });
+
+      if (related.childNodes.length > 0) card.appendChild(related);
+    }
+
+    grid.appendChild(card);
+  });
+
+  section.appendChild(grid);
+  root.appendChild(section);
 }
 
 function renderDocuments(documents) {
@@ -457,6 +483,18 @@ function configureWhatsApp(site) {
   }
 }
 
+function configureTopButton() {
+  const button = byId("top-float");
+  if (!button) return;
+
+  const updateVisibility = () => {
+    button.classList.toggle("is-visible", window.scrollY > 460);
+  };
+
+  updateVisibility();
+  window.addEventListener("scroll", updateVisibility, { passive: true });
+}
+
 async function init() {
   resetToHeroOnReload();
   configureMobileMenu();
@@ -478,6 +516,7 @@ async function init() {
   renderDocuments(documents);
   configureForm(site);
   configureWhatsApp(site);
+  configureTopButton();
 
   const year = byId("year");
   if (year) year.textContent = String(new Date().getFullYear());
