@@ -1312,7 +1312,7 @@ body {
 .brand-word {
   display: block;
   color: #dce8f2;
-  font-size: 0.56rem;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1320,7 +1320,7 @@ body {
 
 .brand-word-accent {
   color: #ffd078;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 800;
   letter-spacing: 0.2em;
 }
@@ -1331,10 +1331,10 @@ body {
   }
 
   .brand-word {
-    font-size: 0.5rem;
+    font-size: 0.54rem;
   }
 
   .brand-word-accent {
-    font-size: 0.68rem;
+    font-size: 0.74rem;
   }
 }
