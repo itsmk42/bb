@@ -243,12 +243,16 @@ body {
 }
 
 .section {
-  padding: 4rem 0;
+  padding: 3.5rem 0;
   position: relative;
 }
 
+main > .section + .section {
+  padding-top: 2.25rem;
+}
+
 .hero {
-  padding-top: 1.25rem;
+  padding-top: 1rem;
 }
 
 .hero-layout {
@@ -1014,7 +1018,11 @@ textarea:focus-visible {
   }
 
   .section {
-    padding: 6rem 0;
+    padding: 5rem 0;
+  }
+
+  main > .section + .section {
+    padding-top: 3rem;
   }
 
   .video-grid {
