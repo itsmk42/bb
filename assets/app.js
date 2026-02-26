@@ -10,7 +10,7 @@ const supabaseKey = String(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
 ).trim();
 // The object exposed by the CDN is window.supabase
-const supabaseClient = window.supabase?.createClient
+const supabaseClient = window.supabase && window.supabase.createClient
   ? supabaseUrl && supabaseKey
     ? window.supabase.createClient(supabaseUrl, supabaseKey)
     : null
@@ -27,7 +27,7 @@ function isReloadNavigation() {
     : [];
 
   if (Array.isArray(entries) && entries.length > 0) {
-    return entries[0]?.type === "reload";
+    return entries[0] && entries[0].type === "reload";
   }
 
   // Legacy fallback for older engines.
@@ -137,7 +137,9 @@ function normalizeSafeUrl(input, { allowRelative = false } = {}) {
 }
 
 function buildMaskedDocumentPath(doc) {
-  const slug = makeSlug(doc?.title || doc?.id || "document");
+  const title = doc && doc.title ? doc.title : "";
+  const id = doc && doc.id ? doc.id : "";
+  const slug = makeSlug(title || id || "document");
   return `/documents/${slug || "document"}`;
 }
 
@@ -153,7 +155,7 @@ function extractUrlFilename(url) {
 
 function buildDownloadFilename(doc, url) {
   const fallback = extractUrlFilename(url);
-  const titleSlug = makeSlug(doc?.title || "");
+  const titleSlug = makeSlug(doc && doc.title ? doc.title : "");
   if (!titleSlug) return fallback;
 
   const extensionMatch = fallback.match(/\.([a-z0-9]{1,8})$/i);
@@ -200,10 +202,29 @@ async function fetchJson(path, fallback) {
 }
 
 async function fetchSupabaseRows(tableName) {
-  if (!supabaseClient) return [];
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.from(tableName).select("*");
+      if (error) return [];
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  if (!supabaseUrl || !supabaseKey) return [];
+
   try {
-    const { data, error } = await supabaseClient.from(tableName).select("*");
-    if (error) return [];
+    const endpoint = `${supabaseUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*`;
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      cache: "no-store"
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
     return Array.isArray(data) ? data : [];
   } catch {
     return [];
@@ -280,7 +301,9 @@ function renderVideos(videos, documents, preferredCategories) {
     if (category === activeVideoCategory) return;
     activeVideoCategory = category;
     renderVideos(videos, documents, preferredCategories);
-    button?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    if (button && typeof button.scrollIntoView === "function") {
+      button.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
   });
 
   if (!activeVideoCategory || !grouped.has(activeVideoCategory)) {
@@ -349,7 +372,8 @@ function renderVideos(videos, documents, preferredCategories) {
 
       video.relatedDocumentIds.forEach((id) => {
         const doc = docsById.get(id);
-        const safeDocUrl = normalizeSafeUrl(doc?.downloadUrl, { allowRelative: true });
+        const docUrl = doc && doc.downloadUrl ? doc.downloadUrl : "";
+        const safeDocUrl = normalizeSafeUrl(docUrl, { allowRelative: true });
         if (!doc || !safeDocUrl) return;
         const link = document.createElement("a");
         link.href = safeDocUrl;
@@ -444,7 +468,7 @@ function configureForm(site) {
   const help = byId("form-help");
   if (!form || !help) return;
 
-  const endpoint = String(site?.inquiryEndpoint || "").trim();
+  const endpoint = String(site && site.inquiryEndpoint ? site.inquiryEndpoint : "").trim();
   const safeEndpoint = normalizeSafeUrl(endpoint);
   if (!safeEndpoint) {
     help.textContent = "Set inquiryEndpoint in /content/site.json to receive form submissions by email.";
@@ -453,7 +477,7 @@ function configureForm(site) {
 
   form.action = safeEndpoint;
 
-  if (site?.inquirySuccessRedirect) {
+  if (site && site.inquirySuccessRedirect) {
     const next = document.createElement("input");
     next.type = "hidden";
     next.name = "_next";
@@ -516,7 +540,7 @@ function configureWhatsApp(site) {
   if (!button) return;
 
   const link = String(
-    site?.whatsappLink ||
+    (site && site.whatsappLink) ||
       "https://wa.me/919019707029?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
   ).trim();
   const safeLink = normalizeSafeUrl(link);
