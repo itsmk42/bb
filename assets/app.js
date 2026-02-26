@@ -517,7 +517,7 @@ function configureWhatsApp(site) {
 
   const link = String(
     site?.whatsappLink ||
-      "https://wa.me/919008697029?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
+      "https://wa.me/919019707029?text=Hi%20Builder%20Ballery%2C%20I%20need%20consultation%20for%20my%20home%20construction."
   ).trim();
   const safeLink = normalizeSafeUrl(link);
 
