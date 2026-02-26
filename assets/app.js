@@ -9,6 +9,7 @@ const supabaseKey = String(
   config.SUPABASE_ANON_KEY ||
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uYWh0bmRtaWx1Z3poandqdGFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2Mzk3NjksImV4cCI6MjA4NzIxNTc2OX0.o5vDHODt9V435xEzv2hyWX_QznZ27XvzVhGuy6InU3U"
 ).trim();
+const storageBucket = String(config.SUPABASE_STORAGE_BUCKET || "documents").trim() || "documents";
 // The object exposed by the CDN is window.supabase
 const supabaseClient = window.supabase && window.supabase.createClient
   ? supabaseUrl && supabaseKey
@@ -69,6 +70,31 @@ function makeSlug(text) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function stripFileExtension(name) {
+  return String(name || "").replace(/\.[^.]+$/, "");
+}
+
+function humanizeStorageFileName(name) {
+  return stripFileExtension(name)
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function encodePath(path) {
+  return String(path || "")
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
+function buildPublicStorageUrl(bucket, objectPath) {
+  if (!supabaseUrl || !bucket || !objectPath) return "";
+  const safeBucket = encodeURIComponent(String(bucket).trim());
+  const safePath = encodePath(objectPath);
+  return `${supabaseUrl}/storage/v1/object/public/${safeBucket}/${safePath}`;
 }
 
 function normalizeInstagramEmbedUrl(input) {
@@ -195,6 +221,25 @@ function formatDate(dateValue) {
   }).format(date);
 }
 
+function mergeDocumentSources(primary, secondary) {
+  const merged = [];
+  const seen = new Set();
+  const sources = [primary, secondary];
+
+  sources.forEach((items) => {
+    if (!Array.isArray(items)) return;
+    items.forEach((item) => {
+      const doc = item || {};
+      const key = String(doc.downloadUrl || doc.id || "").trim().toLowerCase();
+      if (key && seen.has(key)) return;
+      if (key) seen.add(key);
+      merged.push(doc);
+    });
+  });
+
+  return merged;
+}
+
 async function fetchJson(path, fallback) {
   try {
     const response = await fetch(path, { cache: "no-store" });
@@ -221,7 +266,7 @@ function withTimeout(promise, timeoutMs, fallbackValue) {
         clearTimeout(timer);
         resolve(value);
       })
-      .catch((error) => {
+      .catch((_error) => {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
@@ -230,16 +275,38 @@ function withTimeout(promise, timeoutMs, fallbackValue) {
   });
 }
 
+async function fetchRowsViaRest(tableName) {
+  if (!supabaseUrl || !supabaseKey) return [];
+
+  try {
+    const endpoint = `${supabaseUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*`;
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`
+      },
+      cache: "no-store"
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    return [];
+  }
+}
+
 async function fetchSupabaseRows(tableName) {
   if (supabaseClient) {
     return withTimeout(
       (async () => {
         try {
           const { data, error } = await supabaseClient.from(tableName).select("*");
-          if (error) return [];
-          return Array.isArray(data) ? data : [];
+          if (!error && Array.isArray(data) && data.length > 0) {
+            return data;
+          }
+          return fetchRowsViaRest(tableName);
         } catch (error) {
-          return [];
+          return fetchRowsViaRest(tableName);
         }
       })(),
       7000,
@@ -247,22 +314,58 @@ async function fetchSupabaseRows(tableName) {
     );
   }
 
-  if (!supabaseUrl || !supabaseKey) return [];
+  return withTimeout(fetchRowsViaRest(tableName), 7000, []);
+}
+
+async function fetchStorageDocuments() {
+  if (!supabaseUrl || !supabaseKey || !storageBucket) return [];
 
   return withTimeout(
     (async () => {
       try {
-        const endpoint = `${supabaseUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*`;
+        const endpoint = `${supabaseUrl}/storage/v1/object/list/${encodeURIComponent(storageBucket)}`;
         const response = await fetch(endpoint, {
+          method: "POST",
           headers: {
+            "Content-Type": "application/json",
             apikey: supabaseKey,
             Authorization: `Bearer ${supabaseKey}`
           },
+          body: JSON.stringify({
+            prefix: "uploads",
+            limit: 200,
+            offset: 0,
+            sortBy: { column: "created_at", order: "desc" }
+          }),
           cache: "no-store"
         });
+
         if (!response.ok) return [];
-        const data = await response.json();
-        return Array.isArray(data) ? data : [];
+        const rows = await response.json();
+        if (!Array.isArray(rows)) return [];
+
+        return rows
+          .map((row) => {
+            const fileName = String(row && row.name ? row.name : "").trim();
+            if (!fileName || fileName.endsWith("/")) return null;
+
+            const objectPath = `uploads/${fileName}`;
+            const downloadUrl = buildPublicStorageUrl(storageBucket, objectPath);
+            if (!downloadUrl) return null;
+
+            const rawDate = String(
+              (row && (row.updated_at || row.created_at || row.last_accessed_at)) || ""
+            ).trim();
+
+            return {
+              id: `storage-${makeSlug(fileName)}`,
+              title: humanizeStorageFileName(fileName) || "Uploaded Document",
+              description: "Uploaded reference document.",
+              date: rawDate ? rawDate.slice(0, 10) : "",
+              downloadUrl
+            };
+          })
+          .filter(Boolean);
       } catch (error) {
         return [];
       }
@@ -657,13 +760,17 @@ async function init() {
   const year = byId("year");
   if (year) year.textContent = String(new Date().getFullYear());
 
-  const [dbVideos, dbDocuments] = await Promise.all([
+  const [dbVideos, dbDocuments, storageDocuments] = await Promise.all([
     fetchSupabaseRows("videos"),
-    fetchSupabaseRows("documents")
+    fetchSupabaseRows("documents"),
+    fetchStorageDocuments()
   ]);
 
   const videos = Array.isArray(dbVideos) && dbVideos.length > 0 ? dbVideos : fallbackVideos;
-  const documents = Array.isArray(dbDocuments) && dbDocuments.length > 0 ? dbDocuments : fallbackDocuments;
+  const documentsFromDb = Array.isArray(dbDocuments) ? dbDocuments : [];
+  const documentsFromStorage = Array.isArray(storageDocuments) ? storageDocuments : [];
+  const mergedDocuments = mergeDocumentSources(documentsFromDb, documentsFromStorage);
+  const documents = mergedDocuments.length > 0 ? mergedDocuments : fallbackDocuments;
 
   renderVideos(videos, documents, categories);
   renderDocuments(documents);
