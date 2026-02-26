@@ -51,7 +51,11 @@ function resetToHeroOnReload() {
   }
 
   const scrollTopNow = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch (error) {
+      window.scrollTo(0, 0);
+    }
   };
 
   scrollTopNow();
@@ -87,7 +91,7 @@ function normalizeInstagramEmbedUrl(input) {
     if (!["reel", "p", "tv"].includes(type) || !id) return "";
 
     return `https://www.instagram.com/${type}/${id}/embed/captioned/`;
-  } catch {
+  } catch (error) {
     return "";
   }
 }
@@ -112,7 +116,7 @@ function normalizeInstagramPublicUrl(input) {
     if (!["reel", "p", "tv"].includes(type) || !id) return "";
 
     return `https://www.instagram.com/${type}/${id}/`;
-  } catch {
+  } catch (error) {
     return "";
   }
 }
@@ -131,7 +135,7 @@ function normalizeSafeUrl(input, { allowRelative = false } = {}) {
     const parsed = new URL(raw);
     if (!["http:", "https:"].includes(parsed.protocol)) return "";
     return parsed.toString();
-  } catch {
+  } catch (error) {
     return "";
   }
 }
@@ -148,7 +152,7 @@ function extractUrlFilename(url) {
     const parsed = new URL(url, window.location.origin);
     const segment = decodeURIComponent(parsed.pathname.split("/").pop() || "").trim();
     return segment || "document";
-  } catch {
+  } catch (error) {
     return "document";
   }
 }
@@ -196,39 +200,76 @@ async function fetchJson(path, fallback) {
     const response = await fetch(path, { cache: "no-store" });
     if (!response.ok) return fallback;
     return await response.json();
-  } catch {
+  } catch (error) {
     return fallback;
   }
 }
 
+function withTimeout(promise, timeoutMs, fallbackValue) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      resolve(fallbackValue);
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(fallbackValue);
+      });
+  });
+}
+
 async function fetchSupabaseRows(tableName) {
   if (supabaseClient) {
-    try {
-      const { data, error } = await supabaseClient.from(tableName).select("*");
-      if (error) return [];
-      return Array.isArray(data) ? data : [];
-    } catch {
-      return [];
-    }
+    return withTimeout(
+      (async () => {
+        try {
+          const { data, error } = await supabaseClient.from(tableName).select("*");
+          if (error) return [];
+          return Array.isArray(data) ? data : [];
+        } catch (error) {
+          return [];
+        }
+      })(),
+      7000,
+      []
+    );
   }
 
   if (!supabaseUrl || !supabaseKey) return [];
 
-  try {
-    const endpoint = `${supabaseUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*`;
-    const response = await fetch(endpoint, {
-      headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`
-      },
-      cache: "no-store"
-    });
-    if (!response.ok) return [];
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+  return withTimeout(
+    (async () => {
+      try {
+        const endpoint = `${supabaseUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*`;
+        const response = await fetch(endpoint, {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`
+          },
+          cache: "no-store"
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch (error) {
+        return [];
+      }
+    })(),
+    7000,
+    []
+  );
 }
 
 function setHomeCopy(site) {
@@ -524,6 +565,7 @@ function configureMobileMenu() {
     if (event.key === "Escape") closeMenu();
   });
 
+  if (typeof window.matchMedia !== "function") return;
   const desktopMq = window.matchMedia("(min-width: 760px)");
   const handleDesktop = (event) => {
     if (event.matches) closeMenu();
@@ -584,7 +626,7 @@ function wireDocumentActions() {
       const fileName = String(link.dataset.docFilename || "document").trim();
       try {
         await downloadDocumentToDevice(url, fileName);
-      } catch {
+      } catch (error) {
         window.open(url, "_blank", "noopener,noreferrer");
       }
     }
@@ -596,27 +638,37 @@ async function init() {
   configureMobileMenu();
   wireDocumentActions();
 
-  const [siteResponse, fallbackVideos, fallbackDocuments, dbVideos, dbDocuments] = await Promise.all([
+  const [siteResponse, fallbackVideos, fallbackDocuments] = await Promise.all([
     fetchJson(SITE_PATH, {}),
     fetchJson(VIDEOS_PATH, []),
-    fetchJson(DOCUMENTS_PATH, []),
-    fetchSupabaseRows("videos"),
-    fetchSupabaseRows("documents")
+    fetchJson(DOCUMENTS_PATH, [])
   ]);
 
-  const site = siteResponse;
-  const videos = dbVideos.length > 0 ? dbVideos : fallbackVideos;
-  const documents = dbDocuments.length > 0 ? dbDocuments : fallbackDocuments;
+  const site = siteResponse || {};
+  const categories = site.defaultVideoCategories || [];
 
   setHomeCopy(site);
-  renderVideos(videos, documents, site.defaultVideoCategories || []);
-  renderDocuments(documents);
+  renderVideos(fallbackVideos, fallbackDocuments, categories);
+  renderDocuments(fallbackDocuments);
   configureForm(site);
   configureWhatsApp(site);
   configureTopButton();
 
   const year = byId("year");
   if (year) year.textContent = String(new Date().getFullYear());
+
+  const [dbVideos, dbDocuments] = await Promise.all([
+    fetchSupabaseRows("videos"),
+    fetchSupabaseRows("documents")
+  ]);
+
+  const videos = Array.isArray(dbVideos) && dbVideos.length > 0 ? dbVideos : fallbackVideos;
+  const documents = Array.isArray(dbDocuments) && dbDocuments.length > 0 ? dbDocuments : fallbackDocuments;
+
+  renderVideos(videos, documents, categories);
+  renderDocuments(documents);
 }
 
-init();
+init().catch((error) => {
+  console.error("Builder Ballery bootstrap failed", error);
+});
