@@ -1,6 +1,7 @@
 const SITE_PATH = "/content/site.json";
 const VIDEOS_PATH = "/content/videos.json";
 const DOCUMENTS_PATH = "/content/documents.json";
+const PUBLIC_CONTENT_API_PATH = "/api/public-content";
 
 // Initialize Supabase Client
 const config = window.BUILDERBALLERY_CONFIG || {};
@@ -240,6 +241,41 @@ function mergeDocumentSources(primary, secondary) {
   return merged;
 }
 
+function normalizeVideoRow(row) {
+  return {
+    id: row && (row.id || null),
+    title: row && row.title ? row.title : "",
+    category: row && row.category ? row.category : "General",
+    reelUrl: row && (row.reelUrl || row.reel_url) ? (row.reelUrl || row.reel_url) : "",
+    summary: row && row.summary ? row.summary : "",
+    relatedDocumentIds: Array.isArray(row && (row.relatedDocumentIds || row.related_document_ids))
+      ? (row.relatedDocumentIds || row.related_document_ids)
+      : []
+  };
+}
+
+function normalizeDocumentRow(row) {
+  return {
+    id: row && row.id ? row.id : "",
+    title: row && row.title ? row.title : "",
+    description: row && row.description ? row.description : "",
+    date: row && row.date ? row.date : "",
+    downloadUrl: row && (row.downloadUrl || row.download_url) ? (row.downloadUrl || row.download_url) : ""
+  };
+}
+
+function normalizeVideoRows(rows) {
+  return Array.isArray(rows)
+    ? rows.map((row) => normalizeVideoRow(row))
+    : [];
+}
+
+function normalizeDocumentRows(rows) {
+  return Array.isArray(rows)
+    ? rows.map((row) => normalizeDocumentRow(row))
+    : [];
+}
+
 async function fetchJson(path, fallback) {
   try {
     const response = await fetch(path, { cache: "no-store" });
@@ -247,6 +283,20 @@ async function fetchJson(path, fallback) {
     return await response.json();
   } catch (error) {
     return fallback;
+  }
+}
+
+async function fetchPublicContentBundle() {
+  try {
+    const response = await fetch(PUBLIC_CONTENT_API_PATH, { cache: "no-store" });
+    if (!response.ok) return null;
+    const payload = await response.json();
+    return {
+      videos: normalizeVideoRows(payload && payload.videos),
+      documents: normalizeDocumentRows(payload && payload.documents)
+    };
+  } catch (error) {
+    return null;
   }
 }
 
@@ -759,6 +809,19 @@ async function init() {
 
   const year = byId("year");
   if (year) year.textContent = String(new Date().getFullYear());
+
+  const apiBundle = await withTimeout(fetchPublicContentBundle(), 7000, null);
+  if (apiBundle) {
+    const apiVideos = Array.isArray(apiBundle.videos) ? apiBundle.videos : [];
+    const apiDocuments = Array.isArray(apiBundle.documents) ? apiBundle.documents : [];
+    if (apiVideos.length > 0 || apiDocuments.length > 0) {
+      const videosFromApi = apiVideos.length > 0 ? apiVideos : fallbackVideos;
+      const documentsFromApi = apiDocuments.length > 0 ? apiDocuments : fallbackDocuments;
+      renderVideos(videosFromApi, documentsFromApi, categories);
+      renderDocuments(documentsFromApi);
+      return;
+    }
+  }
 
   const [dbVideos, dbDocuments, storageDocuments] = await Promise.all([
     fetchSupabaseRows("videos"),
