@@ -659,8 +659,7 @@ function renderDocuments(documents) {
 
 function configureForm(site) {
   const form = byId("inquiry-form");
-  const help = byId("form-help");
-  if (!form || !help) return;
+  if (!form) return;
 
   const endpoint = String(site && site.inquiryEndpoint ? site.inquiryEndpoint : "").trim();
   const safeEndpoint = normalizeSafeUrl(endpoint);
@@ -671,9 +670,6 @@ function configureForm(site) {
     safeEndpoint.includes("your-email");
 
   if (isPlaceholder) {
-    help.textContent = safeEndpoint
-      ? "Update inquiryEndpoint in /content/site.json with your actual email endpoint before going live."
-      : "Set inquiryEndpoint in /content/site.json to receive form submissions by email.";
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
     return;
@@ -688,8 +684,6 @@ function configureForm(site) {
     next.value = site.inquirySuccessRedirect;
     form.appendChild(next);
   }
-
-  help.textContent = "After submit, details are delivered to your configured email endpoint.";
 }
 
 function configureMobileMenu() {
