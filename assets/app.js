@@ -786,8 +786,30 @@ function wireDocumentActions() {
   });
 }
 
+function checkFormSuccess() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("submitted")) return;
+
+  window.history.replaceState(
+    null,
+    document.title,
+    window.location.pathname + window.location.hash
+  );
+
+  const form = byId("inquiry-form");
+  if (!form) return;
+
+  const success = document.createElement("div");
+  success.className = "form-success";
+  success.innerHTML =
+    '<p class="form-success-title">Inquiry Received!</p>' +
+    "<p>Thank you for reaching out. We\u2019ll review your details and get back to you shortly.</p>";
+  form.replaceWith(success);
+}
+
 async function init() {
   resetToHeroOnReload();
+  checkFormSuccess();
   configureMobileMenu();
   wireDocumentActions();
 
