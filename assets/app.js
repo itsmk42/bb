@@ -659,13 +659,19 @@ function renderDocuments(documents) {
 
 function configureForm(site) {
   const form = byId("inquiry-form");
-  const help = byId("form-help");
-  if (!form || !help) return;
+  if (!form) return;
 
   const endpoint = String(site && site.inquiryEndpoint ? site.inquiryEndpoint : "").trim();
   const safeEndpoint = normalizeSafeUrl(endpoint);
-  if (!safeEndpoint) {
-    help.textContent = "Set inquiryEndpoint in /content/site.json to receive form submissions by email.";
+
+  const isPlaceholder =
+    !safeEndpoint ||
+    safeEndpoint.includes("YOUR_EMAIL") ||
+    safeEndpoint.includes("your-email");
+
+  if (isPlaceholder) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
     return;
   }
 
@@ -677,12 +683,6 @@ function configureForm(site) {
     next.name = "_next";
     next.value = site.inquirySuccessRedirect;
     form.appendChild(next);
-  }
-
-  if (safeEndpoint.includes("YOUR_EMAIL") || safeEndpoint.includes("your-email")) {
-    help.textContent = "Update inquiryEndpoint in /content/site.json with your actual email endpoint before going live.";
-  } else {
-    help.textContent = "After submit, details are delivered to your configured email endpoint.";
   }
 }
 
