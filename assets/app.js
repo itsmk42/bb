@@ -595,7 +595,7 @@ function renderDocuments(documents) {
   if (!Array.isArray(documents) || documents.length === 0) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "No documents added yet. Add PDFs and metadata from the Content Manager.";
+    empty.textContent = "No documents present yet.";
     root.appendChild(empty);
     return;
   }
